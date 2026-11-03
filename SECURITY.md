@@ -1,7 +1,7 @@
-# Zgłaszanie problemów bezpieczeństwa
+# Reporting security issues
 
-EtherPocket jest portem inżynierskim. Model blokady, uprawnienia i ograniczenia opisują `docs/etherlock.rst`, `docs/ethercredentials.rst` i raporty poszczególnych usług.
+EtherPocket is an engineering port. The lock model, permissions and limitations are documented in `docs/etherlock.rst`, `docs/ethercredentials.rst` and individual service reports.
 
-Nie publikuj w publicznym Issue kluczy, tokenów, haseł, danych SIM, kontaktów, numerów telefonów ani surowych zrzutów urządzenia. Jeśli repozytorium udostępnia funkcję prywatnego zgłoszenia podatności w zakładce Security, użyj jej. W przeciwnym razie najpierw poproś opiekuna o prywatny kanał kontaktu bez ujawniania szczegółów podatności.
+Do not post keys, tokens, passwords, SIM data, contacts, phone numbers or raw device dumps in public issues. If private vulnerability reporting is available in the repository's Security tab, use it. Otherwise, ask the maintainer for a private contact channel before disclosing vulnerability details.
 
-Zgłoszenie powinno opisywać komponent, wersję lub commit, model urządzenia, warunki odtworzenia, wpływ i zanonimizowane dowody. Testy wykonuj wyłącznie na sprzęcie, do którego masz uprawnienia. Projekt nie określa obecnie gwarantowanego czasu reakcji ani harmonogramu wspieranych wydań.
+Include the component, version or commit, device model, reproduction conditions, impact and anonymized evidence. Test only on hardware you are authorized to use. The project currently provides no guaranteed response time or supported-release schedule.

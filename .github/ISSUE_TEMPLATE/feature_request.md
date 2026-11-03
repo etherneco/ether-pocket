@@ -1,19 +1,19 @@
 ---
-name: Propozycja funkcji
-about: Opisz potrzebę i oczekiwany rezultat
+name: Feature request
+about: Describe a need and the expected outcome
 title: ''
 labels: ''
 assignees: ''
 ---
 
-## Potrzeba
+## Need
 
-W jakiej sytuacji przyda się zmiana?
+When would this change be useful?
 
-## Oczekiwane działanie
+## Expected behavior
 
-Opisz rezultat i ewentualny model urządzenia.
+Describe the desired outcome and relevant device model, if applicable.
 
-## Kryterium ukończenia
+## Acceptance criteria
 
-Jak można sprawdzić, że funkcja działa?
+How can we verify that the feature works?

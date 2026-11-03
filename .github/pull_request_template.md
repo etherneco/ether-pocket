@@ -1,7 +1,7 @@
-## Problem i rezultat
+## Problem and outcome
 
-Opisz konkretny problem i zachowanie po zmianie.
+Describe the concrete problem and the behavior after this change.
 
-## Weryfikacja
+## Validation
 
-Podaj testy, środowisko oraz ograniczenia. Przy zmianie sprzętowej dodaj raport i sposób odzyskania.
+List tests, the environment and limitations. For hardware changes, include a report and recovery procedure.

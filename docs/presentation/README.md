@@ -1,33 +1,33 @@
-# EtherPocket — prezentacja możliwości
+# EtherPocket capability presentation
 
-[Otwórz prezentację PowerPoint](EtherPocket.pptx). Sześć slajdów, około 3–5 minut. Stan opisu: 3 listopada 2026 r. Tekst na slajdach jest edytowalny, a źródła i istotne zastrzeżenia znajdują się w notatkach prelegenta.
+[Open the PowerPoint presentation (Polish)](EtherPocket.pptx). Six slides, approximately 3–5 minutes. Content status: 3 November 2026. Slide text is editable. Sources and material limitations are included in the speaker notes. The outline below is in English.
 
-## 1. EtherPocket: Linux w kieszeni
+## 1. EtherPocket: Linux in your pocket
 
-EtherPocket to natywny Linux ARM64 na telefonie z dotykowym pulpitem i aplikacjami Linuksa. Referencyjny sprzęt to OnePlus 7 Pro 5G GM1920. Projekt pozostaje portem inżynierskim.
+EtherPocket runs native ARM64 Linux on a phone with a touch desktop and Linux applications. The reference device is the OnePlus 7 Pro 5G GM1920. The project remains an engineering port.
 
-## 2. Dotykowy pulpit Linuksa
+## 2. A touch desktop for Linux
 
-EtherShell łączy launcher aplikacji, obsługę okien, ustawienia i szybkie przełączniki. Klawiatura ekranowa reaguje na edycję, a układy na szerokość ekranu. Pod spodem działają Mobian/Debian, systemd, Xorg i Qt 6. Android ma oddzielny system w konfiguracji dual boot.
+EtherShell combines an application launcher, window controls, settings and quick controls. The on-screen keyboard responds to editing, and layouts adapt to screen width. Mobian/Debian, systemd, Xorg and Qt 6 provide the runtime. Android has a separate system in the dual-boot configuration.
 
-## 3. Pliki i podstawowe multimedia
+## 3. Files and basic multimedia
 
-EtherFiles zarządza plikami, koszem i podglądem oraz obsługuje SFTP, SMB i WebDAV. Dysk wymiany USB umożliwia przesyłanie danych do Windows. EtherCamera wykorzystuje tylny IMX586 do podglądu, JPEG i H.264. Autofocus i pełna jakość fabrycznego aparatu pozostają poza potwierdzonym zakresem.
+EtherFiles manages files, trash and previews, with SFTP, SMB and WebDAV support. A USB exchange disk transfers data to Windows. EtherCamera uses the rear IMX586 for preview, JPEG and H.264. Autofocus and full stock-camera quality remain outside the verified scope.
 
-## 4. Mapy działające offline
+## 4. Offline maps
 
-EtherMAP korzysta z MBTiles, zapisanych miejsc, śladów i GPX. Dostawcy tras i wyszukiwania wymagają konfiguracji. Wyświetlenie mapy nie wymaga fixa GNSS. Sesje GNSS wykrywały satelity, lecz poprawna pozycja nie została potwierdzona.
+EtherMAP supports MBTiles, saved places, tracks and GPX. Routing and search providers require configuration. Displaying a map does not require a GNSS fix. GNSS sessions observed satellites, but a valid position remains unverified.
 
-## 5. Internet i współpraca z Windows
+## 5. Internet and Windows integration
 
-EtherMobile pokazuje postęp sesji LTE i rzeczywisty stan interfejsu. Raport z 3 listopada potwierdza HTTPS 200 przez epcell0. Test dotyczył obecnej konfiguracji giffgaff.com/IPv4 po restarcie usługi, bez kolejnego rebootu. EtherPocket Control zapewnia podgląd i sterowanie X11 z Windows przez SSH, wejście Unicode i zapis PNG. Nie przekazuje dźwięku.
+EtherMobile shows LTE session progress and actual interface status. The 3 November report confirms HTTPS 200 through epcell0 using the current giffgaff.com/IPv4 configuration after a service restart, without another reboot. EtherPocket Control provides X11 viewing and input from Windows over SSH, Unicode text and PNG screenshots. It does not forward audio.
 
-## 6. Stan projektu i dalszy rozwój
+## 6. Project status and development
 
-Istnieją działające elementy pulpitu, plików, map offline, podstawowego aparatu i danych LTE. Do kolejnych bramek należą audio rozmów, fix GNSS, czujniki, suspend, GPU i okulary. Kopie i wydania wymagają konfiguracji. Projekt nie obiecuje dat ukończenia.
+Working elements include the desktop, files, offline maps, basic camera capture and LTE data. Further gates include call audio, a GNSS fix, sensors, suspend, GPU and glasses. Backups and releases require commissioning. No completion dates are promised.
 
-## Pochodzenie obrazów i źródła
+## Image provenance and sources
 
-Obrazy w `images/` są przejrzanymi kopiami zrzutów z izolowanych sesji testowych na telefonie z 29 października 2026. Nie przedstawiają nowej sesji demonstracyjnej. Oryginały pozostają w lokalnym archiwum `evidence/ui-polish/`. Ekran map zachowuje oznaczenie © OpenStreetMap contributors, ODbL 1.0. [Warunki danych mapowych](https://www.openstreetmap.org/copyright).
+The images in `images/` are reviewed copies of screenshots from isolated on-device test sessions on 29 October 2026. They do not represent a new demonstration session. Originals remain in the local `evidence/ui-polish/` archive. The map retains its attribution: © OpenStreetMap contributors, ODbL 1.0. [Map data terms](https://www.openstreetmap.org/copyright).
 
-Podstawy techniczne opisują [projekt](../PROJECT.pl.md), [stan możliwości](../STATUS.pl.md), [interfejs](../ui-polish-2026-10-29.rst), [aparat](../ethercamera-spectra-driver-2026-10-20.rst), [mapy](../ethermap-device-delivery-2026-10-21.rst), [LTE](../mobile-data-progress-2026-11-03.rst) i [sterowanie Windows](../etherpocket-control-2026-10-29.rst). Dokładniejsze odnośniki umieszczono także w notatkach slajdów.
+Technical references include the [project overview](../PROJECT.md), [capability status](../STATUS.md), [interface](../ui-polish-2026-10-29.rst), [camera](../ethercamera-spectra-driver-2026-10-20.rst), [maps](../ethermap-device-delivery-2026-10-21.rst), [LTE](../mobile-data-progress-2026-11-03.rst) and [Windows control](../etherpocket-control-2026-10-29.rst). More specific references are also included in the slide notes.

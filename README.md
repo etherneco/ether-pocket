@@ -1,41 +1,41 @@
 # EtherPocket
 
-**Natywny Linux ARM64 na telefonie, z dotykowym pulpitem i własnym zestawem aplikacji.**
+**Native ARM64 Linux on a phone, with a touch desktop and an integrated application suite.**
 
-EtherPocket rozwija telefon w kierunku kieszonkowego komputera z systemem Mobian/Debian. System uruchamia własny kernel Linuksa, sesję Xorg oraz EtherShell, interfejs napisany w Qt 6/QML. Aplikacje i usługi działają bezpośrednio w Linuksie. Projekt obejmuje również narzędzia integracji sprzętu, diagnostykę oraz sterowanie pulpitem z Windows przez SSH.
+EtherPocket turns a phone into a pocket computer running Mobian/Debian. It boots its own Linux kernel, an Xorg session and EtherShell, a Qt 6/QML interface. Applications and services run directly on Linux. The project also includes hardware integration, diagnostics and remote desktop control from Windows over SSH.
 
-Obecnym urządzeniem referencyjnym jest **OnePlus 7 Pro 5G GM1920**. Repozytorium zawiera kod i dokumentację portu inżynierskiego. Gotowość funkcji zależy od konkretnego urządzenia, sterowników i konfiguracji.
+The current reference device is the **OnePlus 7 Pro 5G GM1920**. This repository contains the source code and documentation for an engineering port. Feature readiness depends on the device, drivers and configuration.
 
-## Zobacz projekt
+## Explore the project
 
-- [Dokładny opis, architektura i scenariusze użycia](docs/PROJECT.pl.md)
-- [Możliwości i ograniczenia według ostatnich raportów](docs/STATUS.pl.md)
-- [Krótka prezentacja PowerPoint](docs/presentation/EtherPocket.pptx)
-- [Treść prezentacji i scenariusz pokazu](docs/presentation/README.md)
-- [Zasady pracy z repozytorium](CONTRIBUTING.md)
-- [Historia wdrożeń i wcześniejsze raporty](README.rst)
+- [Detailed overview, architecture and use cases](docs/PROJECT.md)
+- [Verified capabilities and remaining limitations](docs/STATUS.md)
+- [Short PowerPoint presentation (Polish)](docs/presentation/EtherPocket.pptx)
+- [Presentation outline and demonstration notes](docs/presentation/README.md)
+- [Contribution guide](CONTRIBUTING.md)
+- [Deployment history and earlier reports](README.rst)
 
-## Co oferuje EtherPocket
+## Capabilities
 
-| Obszar | Elementy projektu | Zakres |
+| Area | Components | Scope |
 | --- | --- | --- |
-| Pulpit dotykowy | EtherShell, EtherKeyboard | Launcher aplikacji XDG, ustawienia, szybkie przełączniki, obsługa okien i klawiatura ekranowa |
-| Pliki i wymiana danych | EtherFiles, USB Storage | Operacje na plikach, kosz, podgląd, SFTP/SMB/WebDAV i dysk wymiany USB |
-| Internet | EtherMobile, EtherShare | Obsługa modemu i postępu połączenia, diagnostyka LTE, kontrolowane współdzielenie łącza |
-| Multimedia | EtherCamera, EtherAudio | Podstawowe zdjęcia i wideo z tylnego IMX586, polityka audio i kontrola mikrofonu |
-| Mapy | EtherMAP, EtherLocation | Mapy offline, zapisane miejsca, ślady i GPX, uprawnienia lokalizacji |
-| Komunikacja | EtherPhone, EtherSMS, EtherNotifications | Interfejs rozmów i wiadomości, kontakty, historia i centrum powiadomień |
-| Utrzymanie | EtherHardware, EtherPower, EtherSensors | Diagnostyka sprzętu, zarządzanie energią i rejestr możliwości czujników |
-| Ochrona i aktualizacje | EtherLock, EtherCredentials, EtherBackup, EtherUpdate | Blokowanie sesji, poświadczenia, szyfrowane kopie i weryfikacja aktualizacji |
-| Komputer z Windows | EtherPocket Control | Podgląd i sterowanie rzeczywistym pulpitem X11 przez SSH |
+| Touch desktop | EtherShell, EtherKeyboard | XDG application launcher, settings, quick controls, window management and on-screen keyboard |
+| Files and data exchange | EtherFiles, USB Storage | File operations, trash, previews, SFTP/SMB/WebDAV and a USB exchange disk |
+| Internet | EtherMobile, EtherShare | Modem integration, connection progress, LTE diagnostics and controlled connection sharing |
+| Multimedia | EtherCamera, EtherAudio | Basic rear IMX586 photo/video capture, audio policy and microphone controls |
+| Maps | EtherMAP, EtherLocation | Offline maps, saved places, tracks, GPX and location permissions |
+| Communication | EtherPhone, EtherSMS, EtherNotifications | Call and messaging interfaces, contacts, history and notification center |
+| System management | EtherHardware, EtherPower, EtherSensors | Hardware diagnostics, power management and sensor capability registry |
+| Protection and updates | EtherLock, EtherCredentials, EtherBackup, EtherUpdate | Session locking, credentials, encrypted backups and update verification |
+| Windows integration | EtherPocket Control | View and control the actual X11 desktop over SSH |
 
-**Stan opisany 3 listopada 2026 r., na podstawie zapisanej dokumentacji:** raport z tego dnia potwierdza HTTPS przez interfejs LTE `epcell0`. Połączenie głosowe osiągnęło stan Active, lecz dwukierunkowy dźwięk pozostaje niepotwierdzony. GNSS bez zweryfikowanego fixa, okulary AR, akceleracja GPU i suspend nadal wymagają akceptacji. Obecność interfejsu w aplikacji nie oznacza ukończonej obsługi sprzętu. Szczegóły i daty podaje [tabela stanu](docs/STATUS.pl.md).
+**Status as documented on 3 November 2026:** that day's report confirms HTTPS through the LTE interface `epcell0`. A real voice call reached Active, but two-way audio remains unverified. A valid GNSS fix, AR glasses, GPU acceleration and suspend still require acceptance testing. An application interface alone does not establish working hardware support. See the [status matrix](docs/STATUS.md) for dates and scope.
 
-## Architektura w skrócie
+## Architecture
 
-System opiera się na Mobian/Debian ARM64, systemd i Xorg. EtherShell oraz aplikacje Qt/QML korzystają z osobnych usług i adapterów przez D-Bus. Integracje wykorzystują między innymi NetworkManager, ModemManager/QMI, BlueZ, PipeWire/WirePlumber, PAM i PolicyKit. Skrypty przygotowują pakiety Debian, kontrolują wdrożenia i zapisują wyniki testów. XFCE pełni rolę pulpitu odzyskiwania. Android zachowuje oddzielny system i kernel w konfiguracji dual boot.
+The system uses Mobian/Debian ARM64, systemd and Xorg. EtherShell and the Qt/QML applications communicate with separate services and adapters over D-Bus. Integrations include NetworkManager, ModemManager/QMI, BlueZ, PipeWire/WirePlumber, PAM and PolicyKit. Scripts build Debian packages, manage deployments and record verification results. XFCE provides a recovery desktop. Android retains its own system and kernel in the dual-boot configuration.
 
-## Rozpoczęcie pracy
+## Getting started
 
 ```sh
 git clone https://github.com/etherneco/ether-pocket.git
@@ -44,28 +44,28 @@ python -m unittest discover -s tests -p test_x11.py
 python -m unittest discover -s etherpocket-control -p test_transport.py
 ```
 
-Te testy korzystają ze standardowej biblioteki Pythona i nie łączą się z telefonem. Testy stanu modemu wymagają Linux/POSIX:
+These tests use the Python standard library and do not connect to a phone. Modem status tests require Linux/POSIX:
 
 ```sh
 python3 -m unittest discover -s tests -p test_mobile_data_status.py
 PYTHONPATH=scripts python3 -m unittest discover -s tests -p test_ethermobile_data_cleanup.py
 ```
 
-Pakiety urządzenia buduje się w środowisku Linux z Qt 6, CMake/Ninja i zależnościami danego modułu. Przykład budowania EtherFiles z konfiguracją cross-compilation znajduje się w `scripts/build-etherfiles-cross.sh`, a wymagania środowiska w [dokumentacji EtherFiles](etherfiles/README.rst). Nie ma jednego instalatora całego systemu. Skrypty wdrożeniowe mogą zawierać założenia dotyczące konkretnego urządzenia i lokalnego środowiska autora.
+Device packages require a Linux build environment with Qt 6, CMake/Ninja and component-specific dependencies. `scripts/build-etherfiles-cross.sh` provides an EtherFiles cross-compilation example. See the [EtherFiles documentation](etherfiles/README.rst) for environment requirements. There is no single installer for the entire system. Deployment scripts may assume a specific device and the author's local environment.
 
-## Struktura repozytorium
+## Repository layout
 
-- `ether*/` — aplikacje, usługi, definicje D-Bus, pakietowanie i testy modułów.
-- `scripts/` — budowanie, diagnostyka, wdrożenia i weryfikacja.
-- `kernel/`, `xorg/`, `config/` — poprawki i konfiguracja warstwy systemowej.
-- `tests/` — testy narzędzi i integracji bez fizycznego urządzenia.
-- `docs/` — opis projektu oraz datowane raporty techniczne.
-- `assets/` — grafika projektu.
+- `ether*/`: applications, services, D-Bus definitions, packaging and component tests.
+- `scripts/`: builds, diagnostics, deployments and verification.
+- `kernel/`, `xorg/`, `config/`: system patches and configuration.
+- `tests/`: host-side tooling and integration tests without physical hardware.
+- `docs/`: project documentation and dated technical reports.
+- `assets/`: project artwork.
 
-Lokalne katalogi `build/`, `sources/`, `tools/`, `recovery/` i surowe materiały `evidence/` nie są częścią publikowanego kodu. Historyczne raporty mogą wskazywać pliki dostępne wyłącznie w lokalnym archiwum. Firmware producenta, klucze i kopie partycji nie są dołączane.
+Local `build/`, `sources/`, `tools/`, `recovery/` directories and raw `evidence/` materials are excluded from the published source. Historical reports may reference files available only in the local archive. Vendor firmware, keys and partition backups are not included.
 
-## Rozwój i prawa do kodu
+## Contributing and licensing
 
-Zgłoszenia błędów i propozycje zmian można dodawać w [Issues](https://github.com/etherneco/ether-pocket/issues). Zasady opisywania zmian zawiera [CONTRIBUTING.md](CONTRIBUTING.md), a zgłaszania problemów bezpieczeństwa [SECURITY.md](SECURITY.md).
+Report bugs and propose changes through [Issues](https://github.com/etherneco/ether-pocket/issues). See [CONTRIBUTING.md](CONTRIBUTING.md) for contribution guidance and [SECURITY.md](SECURITY.md) for vulnerability reporting.
 
-Nie ustalono jeszcze wspólnej licencji dla całego repozytorium. Nie należy zakładać, że cały kod można redystrybuować na jednej licencji. Przed dystrybucją trzeba sprawdzić prawa do poszczególnych komponentów i poprawek, w tym kodu pochodzącego z innych projektów. Ta konfiguracja repozytorium nie zmienia istniejących nagłówków licencyjnych.
+A repository-wide license has not yet been established. Do not assume all code can be redistributed under a single license. Check the rights covering each component and patch, including material derived from other projects, before redistribution. This repository setup does not change existing license notices.

@@ -1,41 +1,42 @@
-# Praca nad EtherPocket
+# Contributing to EtherPocket
 
-## Przygotowanie
+## Preparation
 
-Sklonuj repozytorium i utwórz gałąź, np. `git switch -c docs/opis-modulu`. Przeczytaj README modułu, jego `CMakeLists.txt` oraz odpowiedni skrypt budowania. Biblioteki Qt, zależności systemowe i toolchain ARM64 zależą od komponentu. Zwykłe testy hosta nie wymagają dostępu administratora do telefonu.
+Clone the repository and create a branch, for example `git switch -c docs/component-overview`. Read the component README, its `CMakeLists.txt` and the relevant build script. Qt libraries, system dependencies and the ARM64 toolchain vary by component. Ordinary host tests do not require administrator access to the phone.
 
-## Testy bez urządzenia
+## Tests without a device
 
-Na Windows i Linux:
+On Windows and Linux:
 
 ```sh
 python -m unittest discover -s tests -p test_x11.py
 python -m unittest discover -s etherpocket-control -p test_transport.py
 ```
 
-Na Linux, dodatkowo:
+Additionally, on Linux:
 
 ```sh
 python3 -m unittest discover -s tests -p test_mobile_data_status.py
 PYTHONPATH=scripts python3 -m unittest discover -s tests -p test_ethermobile_data_cleanup.py
 ```
 
-Druga grupa korzysta z założeń POSIX, w tym `O_NOFOLLOW`. Nie należy osłabiać zabezpieczeń kodu produkcyjnego, aby uruchamiać ją na Windows. CI uruchamia wskazane testy na Linux oraz testy przenośne na Windows. Nie buduje całego obrazu, nie uruchamia telefonu i nie potwierdza funkcji sprzętu.
+The second group relies on POSIX behavior, including `O_NOFOLLOW`. Do not weaken production security controls to run these tests on Windows. CI runs the listed tests on Linux and the portable tests on Windows. It does not build a complete system image, boot a phone or verify hardware features.
 
-## Zmiany i przegląd
+## Changes and review
 
-- Opisz konkretny problem i zachowanie po zmianie.
-- Podaj wykonane testy, środowisko i ograniczenia wyniku.
-- Przy zmianach sprzętowych dodaj datowany raport w `docs/`, model urządzenia oraz procedurę odzyskania.
-- Aktualizuj `docs/STATUS.pl.md`, gdy nowe dowody zmieniają gotowość funkcji.
-- Zachowuj UTF-8. Kod Python, powłoki i pliki Linux mają LF. Skrypty Windows mają CRLF.
+- Describe the concrete problem and resulting behavior.
+- State the tests performed, environment and limits of the results.
+- For hardware changes, add a dated report in `docs/`, the device model and recovery procedure.
+- Update `docs/STATUS.md` when new evidence changes feature readiness.
+- Use English for new repository documentation, issues, pull requests and commit messages. Explicitly localized materials may retain their target language.
+- Use UTF-8. Python, shell scripts and Linux files use LF. Windows scripts use CRLF.
 
-## Urządzenie i dane lokalne
+## Device operations and local data
 
-Nie uruchamiaj skryptów flashowania, partycjonowania, aktywacji ani testów połączeń na podstawie samej nazwy. Najpierw sprawdź ich kod, identyfikację sprzętu i założenia. Skrypty często wskazują istniejące lokalne ścieżki do kluczy i adres USB autora. Nowe stanowisko wymaga własnego dostępu SSH i weryfikacji hosta.
+Read flashing, partitioning, activation and call-test scripts before running them. Check device identity and script assumptions. Scripts often reference the author's existing local key paths and USB address. A new workstation needs its own SSH authorization and host verification.
 
-Nie dodawaj kluczy, tokenów, haseł Wi-Fi, profili NetworkManager, kopii partycji, baz kontaktów ani prywatnych mediów. Surowe wyniki przechowuj lokalnie w `evidence/`. Materiał do publikacji przejrzyj i zanonimizuj przed przeniesieniem do `docs/`. `.gitignore` ogranicza przypadkowe dodanie, ale nie zastępuje kontroli `git diff --cached`.
+Do not commit keys, tokens, Wi-Fi passwords, NetworkManager profiles, partition backups, contact databases or private media. Keep raw results locally in `evidence/`. Review and anonymize material before moving it into `docs/` for publication. `.gitignore` reduces accidental additions but does not replace reviewing `git diff --cached`.
 
-## Licencja
+## Licensing
 
-Nie dodawaj jednej licencji do całego projektu bez ustalenia praw do komponentów i kodu zewnętrznego. Zachowuj istniejące informacje o autorach i warunki wykorzystania.
+Do not add a project-wide license before establishing the rights covering its components and external code. Preserve existing author notices and terms of use.

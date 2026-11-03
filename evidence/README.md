@@ -1,5 +1,5 @@
-# Lokalne archiwum weryfikacji
+# Local verification archive
 
-Datowane raporty w `docs/` odwołują się do wyników JSON, logów, zrzutów ekranu i innych materiałów przechowywanych lokalnie w tym katalogu. Surowe materiały są wyłączone z Git, ponieważ mogą zawierać dane urządzenia, sieci lub użytkownika. Klon repozytorium nie odtwarza tego archiwum.
+Dated reports in `docs/` reference JSON results, logs, screenshots and other materials stored locally in this directory. Raw materials are excluded from Git because they may contain device, network or user data. Cloning the repository does not reproduce this archive.
 
-Przed publikacją wybranego materiału sprawdź dane osobowe, identyfikatory sprzętu, poświadczenia, zawartość ekranu i prawa do redystrybucji. Przejrzany materiał można umieścić w odpowiednim podkatalogu `docs/` razem z opisem źródła i ograniczeń.
+Before publishing selected material, check personal data, hardware identifiers, credentials, screen contents and redistribution rights. Reviewed material can be placed in the relevant `docs/` subdirectory with its source and limitations documented.

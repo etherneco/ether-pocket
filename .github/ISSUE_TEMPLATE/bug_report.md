@@ -1,6 +1,6 @@
 ---
-name: Błąd
-about: Zgłoś konkretny problem w EtherPocket
+name: Bug report
+about: Report a specific problem in EtherPocket
 title: ''
 labels: ''
 assignees: ''
@@ -8,12 +8,12 @@ assignees: ''
 
 ## Problem
 
-Co się wydarzyło i jakiego zachowania oczekiwano?
+What happened, and what behavior did you expect?
 
-## Odtworzenie
+## Reproduction
 
-Podaj kroki, komponent i commit. Dla sprzętu dodaj model, kernel i typ sesji.
+Provide steps, the component and commit. For hardware issues, include the device model, kernel and session type.
 
-## Wyniki
+## Results
 
-Dodaj zanonimizowany komunikat lub minimalny log. Nie dodawaj danych SIM, poświadczeń ani prywatnych treści ekranu.
+Include an anonymized message or minimal log. Do not include SIM data, credentials or private screen content.
