@@ -1,0 +1,47 @@
+--- a/hw/xfree86/drivers/modesetting/driver.c
++++ b/hw/xfree86/drivers/modesetting/driver.c
+@@ -579,8 +579,16 @@
+             }
+         }
+ 
++        /* Command-mode downstream DSI needs a commit after CPU damage.
++         * Its framebuffer has no working DIRTYFB callback. Re-submit the
++         * active plane through the existing atomic flip helper. */
++        if (ms->atomic_modeset && ms->drmmode.shadow_enable && crtc->enabled &&
++            (ret == -EINVAL || ret == -ENOSYS))
++            ret = drmmode_crtc_flip(crtc, fb_id, 0, NULL);
++
+         free(clip);
+-        DamageEmpty(damage);
++        if (ret == 0)
++            DamageEmpty(damage);
+     }
+     return ret;
+ }
+@@ -599,13 +607,14 @@
+         xf86CrtcPtr crtc = xf86_config->crtc[c];
+         drmmode_crtc_private_ptr drmmode_crtc = crtc->driver_private;
+ 
+-        if (!drmmode_crtc)
++        if (!drmmode_crtc || !crtc->enabled)
+             continue;
+ 
+ 	drmmode_crtc_get_fb_id(crtc, &fb_id, &x, &y);
+ 
+         ret = dispatch_dirty_region(scrn, crtc, pixmap, ms->damage, fb_id);
+-        if (ret == -EINVAL || ret == -ENOSYS) {
++        if ((ret == -EINVAL || ret == -ENOSYS) &&
++            !(ms->atomic_modeset && ms->drmmode.shadow_enable)) {
+             ms->dirty_enabled = FALSE;
+             DamageUnregister(ms->damage);
+             DamageDestroy(ms->damage);
+@@ -1628,7 +1637,8 @@
+ 
+     err = drmModeDirtyFB(ms->fd, ms->drmmode.fb_id, NULL, 0);
+ 
+-    if (err != -EINVAL && err != -ENOSYS) {
++    if ((ms->atomic_modeset && ms->drmmode.shadow_enable) ||
++        (err != -EINVAL && err != -ENOSYS)) {
+         ms->damage = DamageCreate(NULL, NULL, DamageReportNone, TRUE,
+                                   pScreen, rootPixmap);
+ 

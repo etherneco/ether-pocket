@@ -1,0 +1,1 @@
+{"schemaVersion":1,"name":"EtherNotifications","slug":"ethernotifications","version":"0.1.0","platform":"linux","architecture":"arm64","format":"deb","package":"ethernotifications_0.1.0_arm64.deb","settingsRoute":"sound","service":"com.etherneco.EtherNotifications1","publication":"Local engineering package for the existing Etherneco distributor; no separate catalog or updater"}

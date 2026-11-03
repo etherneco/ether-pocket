@@ -1,0 +1,12 @@
+#!/bin/sh
+set -eu
+# This command runs as the logged-in desktop user; it never touches boot files.
+pkill -u "$(id -u)" -x ethershell || true
+# Allow the companion's normal signal handler to restore saved window geometry.
+sleep 1
+if [ "${1:-}" = "--restore-apps" ]; then ethershell-app-settings restore; fi
+if [ "${1:-}" = "--reset" ]; then
+    config="${XDG_CONFIG_HOME:-$HOME/.config}/ethershell/preferences.json"
+    if [ -f "$config" ]; then mv "$config" "$config.backup-$(date +%s)"; fi
+fi
+printf '%s\n' 'EtherShell stopped. XFCE remains available from the login session selector.'

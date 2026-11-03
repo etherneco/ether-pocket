@@ -1,0 +1,45 @@
+{{- $architecture := or .architecture "arm64" -}}
+architecture: {{ $architecture }}
+actions:
+  - action: apt
+    recommends: false
+    description: Install native Xorg and XFCE desktop
+    packages:
+      - xserver-xorg-core
+      - xinit
+      - xauth
+      - x11-xserver-utils
+      - xinput
+      - xserver-xorg-input-libinput
+      - xfce4
+      - xfce4-terminal
+      - openbox
+      - lightdm
+      - lightdm-gtk-greeter
+      - mesa-utils
+      - mesa-utils-bin
+      - libgl1-mesa-dri
+      - libegl-mesa0
+      - libgles2
+      - x11-utils
+      - onboard
+      - xfce4-appfinder
+      - xfce4-power-manager
+      - wmctrl
+      - xdg-utils
+      - python3
+      - busybox-static
+      - openssh-server
+      - qbootctl
+  - action: overlay
+    source: ../overlays/etherpocket/
+    destination: /
+  - action: run
+    description: Configure X11 default without starting services during image build
+    chroot: true
+    command: |
+      printf '/usr/sbin/lightdm\n' > /etc/X11/default-display-manager
+      systemctl enable --force lightdm.service
+      systemctl set-default graphical.target
+      systemctl mask systemd-repart.service systemd-growfs-root.service
+      chmod 755 /usr/local/bin/etherair-x11

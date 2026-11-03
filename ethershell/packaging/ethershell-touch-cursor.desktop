@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=EtherPocket touch cursor
+Comment=Hide the pointer for touchscreen use and restore it for a mouse
+Exec=/usr/bin/ethershell-touch-cursor
+TryExec=/usr/bin/unclutter-xfixes
+Terminal=false
+NoDisplay=true

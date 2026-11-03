@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.etherneco.EtherCamera1
+Exec=/usr/bin/python3 /usr/share/ethercamera/service.py
+SystemdService=ethercamera.service

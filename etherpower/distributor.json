@@ -1,0 +1,1 @@
+{"schemaVersion":1,"name":"EtherPower","slug":"etherpower","version":"0.1.0","platform":"linux","architecture":"arm64","format":"deb","package":"etherpower_0.1.0_arm64.deb","settingsRoute":"power","service":"com.etherneco.EtherPower1","publication":"Local package; hosted release requires distributor credentials"}

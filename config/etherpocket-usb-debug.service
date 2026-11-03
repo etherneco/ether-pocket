@@ -1,0 +1,15 @@
+[Unit]
+Description=EtherPocket native USB debug network for RAM tests
+After=systemd-udev-settle.service
+Wants=systemd-udev-settle.service
+Before=ssh.service
+ConditionKernelCommandLine=etherpocket.ramboot=1
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/etherpocket-usb-debug
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

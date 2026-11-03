@@ -1,0 +1,260 @@
+EtherSMS implementation and compatibility — 2026-10-19
+======================================================
+
+Live validation after user approval
+-----------------------------------
+
+The user approved a Wi-Fi model download and real SMS tests to their second
+number (ending 2482). The saved Wi-Fi connection was enabled and activated.
+The 147,951,465-byte multilingual Whisper base model was downloaded with curl
+bound to wlan0, then checked against the publisher's LFS SHA-256:
+60ed5bc3dd14eea856493d334349b405782ddcaf0028d4b5df4088345fba2efe.
+The repository revision and checksum are in evidence/ethersms-model-source.json;
+installation is recorded in evidence/ethersms-model-install.json. No cellular
+fallback was allowed for the download.
+
+The first two SMS attempts were rejected before creation by ModemManager's
+Messaging authorization. The existing per-user launcher runs outside logind's
+active seat session. config/49-etherpocket-sms.rules grants only the Messaging
+action to the device owner mobian, following the existing Wi-Fi rule's pattern.
+It grants no radio, data, SIM-lock, firmware or general modem-control permission.
+The adapter now permits interactive authorization for explicit Create/Send and
+classifies definitive permission/argument rejection as Failed; lost replies
+remain Uncertain. The rejected attempts were verified to have no modem SMS
+object before controlled retry. No automatic retry was added.
+
+A real test message was then submitted by the normal user through the actual
+EtherSMS C++ controller, transport and private message database. The user
+confirmed it arrived on the second phone. Separate GSM-7 (one segment) and
+multipart Unicode (two estimated segments) tests were also submitted and are
+reported as sent by ModemManager. These two variants still require external
+receipt confirmation. Human receipt confirmation is recorded here; the app
+continues to show Submitted to network because no matching carrier delivery
+report was observed. See evidence/ethersms-live-send-003.json and
+ethersms-live-send-variants.json. The opt-in live-test target is not installed
+and is not part of CTest. It takes its authorized recipient from the environment
+and uses an exclusive receipt journal to prevent accidental reruns.
+
+The model installer had a Windows CRLF shebang defect, discovered by executing
+its installed Linux entry point. The source is now LF, CMake emits a Unix-line
+ending copy, and a regression test covers the shebang. Direct installed model
+import and listing now work. The model-helper suite now has four tests.
+
+Offline native ARM64 benchmarks, four threads, maximum address space 3 GiB:
+
+===================== ============= =============== ==============
+Sample                Audio seconds Runtime seconds Peak RSS KiB
+===================== ============= =============== ==============
+Polish synthetic      5.04          5.92            289460
+English synthetic     5.39          5.45            289544
+English human (JFK)   11.00          6.12            290036
+===================== ============= =============== ==============
+
+English samples transcribed correctly. The Polish eSpeak fixture produced word
+errors; this establishes execution, not acceptable real-microphone Polish
+accuracy. Real Polish speech and end-to-end dictation still need user testing.
+See evidence/ethersms-offline-recognition.json. No microphone audio was captured
+for these benchmarks; the fixtures were synthetic or upstream public test audio.
+
+Microphone routing is no longer blocked at discovery. A read-only, no-journal
+mount of the existing vendor partition supplied the exact OEM audio-record and
+handset-mic-rec -> amic3 controls. No vendor partition was written. The downstream
+PCM driver requires a valid capture route before ACP probes it: device-only UCM
+routing caused PREPARE/EINVAL and removed HiFi during probing. Moving the known
+route setup into the HiFi verb resolves that prerequisite. The existing UCM
+profile now exposes Speaker and HandsetMic. Capture preparation without starting
+or reading frames succeeds for S16/S32 and RW/MMAP. The actual microphone source
+is SUSPENDED when unused and /proc/asound/card0/pcm0c/sub0/status is closed.
+See config/audio/HiFi.conf and evidence/ethersms-microphone-source-final.json.
+The prior configuration is preserved on the phone as
+HiFi.conf.before-ethersms-microphone. No uncontrolled recording was performed.
+The user was asked to test the visible microphone workflow in EtherSMS.
+
+The existing audio services were reloaded while no playback streams were active;
+the speaker output is restored and present alongside the microphone. Cellular
+HTTP bound to epcell0 still succeeds while Wi-Fi is connected, and the modem,
+NetworkManager, Bluetooth, SSH and EtherMobile data services remain active.
+See evidence/ethersms-approved-validation-state.json. Incoming SMS validation is
+waiting for the user's reply; no incoming message had been observed at that check.
+
+The following sections preserve the initial implementation audit and its earlier
+limitations; the updates above supersede its model, microphone and send blockers.
+
+Release assessment
+------------------
+
+EtherSMS 0.1.0 is a native Qt 6/QML/C++ application, packaged for Debian ARM64
+and installed on the physical GM1920 EtherPocket. This is an initial implementation,
+not acceptance of every requirement in the master task. No live SMS was sent,
+received, or fabricated during implementation. The reference image supplied a
+visual design, not authorization to send to its example numbers.
+
+The existing EtherMobile library now provides an asynchronous ModemManager SMS
+adapter. There is no second modem manager, raw AT sender, direct QMI WMS client,
+new background modem daemon, radio change, kernel change or partition write.
+The existing downstream EtherMobile data adapter remains running independently.
+
+Compatibility audit
+-------------------
+
+The audit was performed over the project's existing pinned USB SSH connection.
+See evidence/ethersms-audit-2026-10-19.json. The physical phone exposes ModemManager's
+Modem.Messaging Create, List, Delete, Added and storage properties. Its real SMS
+list was empty. QRTR advertises Wireless Messaging Service (service 5). oFono is
+inactive. The SIM is ready for ordinary service (SIM PIN2 is not the ordinary
+SIM PIN); network registration is home, packet service attached. This verifies
+interface exposure and registration, not successful end-to-end SMS delivery.
+
++------------------------+--------------------+------------------------------------------+
+| Feature                | Status             | Evidence / limitation                    |
++========================+====================+==========================================+
+| SMS sending            | Partially working  | Async Create/Send adapter; live test      |
+|                        |                    | waits for an authorized recipient.       |
++------------------------+--------------------+------------------------------------------+
+| SMS receiving          | Partially working  | Real List/Added/property subscriptions;  |
+|                        |                    | no incoming test SMS observed.           |
++------------------------+--------------------+------------------------------------------+
+| Message storage        | Working            | SQLite migrations, restart, drafts,      |
+|                        |                    | backups and deduplication tested.        |
++------------------------+--------------------+------------------------------------------+
+| Delivery reports       | Partially working  | Conservative current-session matching;   |
+|                        |                    | carrier confirmation unverified.         |
++------------------------+--------------------+------------------------------------------+
+| SIM storage            | Partially working  | Modem exports storages 1 and 2; no SIM    |
+|                        |                    | storage mutation or management tested.   |
++------------------------+--------------------+------------------------------------------+
+| Voice recording        | Blocked            | PipeWire exposes only a speaker monitor. |
+|                        |                    | Existing UCM defines playback only.      |
++------------------------+--------------------+------------------------------------------+
+| Offline transcription  | Partially working  | Native ARM64 whisper-cli built, installed|
+|                        |                    | and launches; no approved model yet.     |
++------------------------+--------------------+------------------------------------------+
+| Text-to-speech         | Partially working  | PL/EN synthesis tested on ARM64; audible  |
+|                        |                    | playback and routing remain unverified.  |
++------------------------+--------------------+------------------------------------------+
+
+ALSA advertises capture PCM devices, but that alone does not establish a routed
+microphone. The existing EtherPocket UCM HiFi configuration contains a Speaker
+device and no capture device. No guessed mixer settings or speaker-monitor
+recording fallback were applied. PulseAudio/PipeWire, parec and paplay already
+exist. The app discovers actual sources and explicitly rejects monitor sources.
+
+No contacts backend, Whisper/Vosk executable, Piper/eSpeak executable or running
+Ollama/EtherMCP service was found in the initial audit. A minimal local contacts
+provider is therefore included. eSpeak NG and the SQLite driver were installed.
+The optional whisper.cpp CLI was cross-built as a separate small package without
+speech models. Its upstream source revision is recorded in
+``evidence/ethersms-whisper-source-commit.txt``. No speech model was downloaded.
+
+Implementation
+--------------
+
+* ethermobile/sms.h and sms.cpp: UI-independent transport interface and real
+  existing-service adapter, selected-modem filtering, owner-change handling,
+  complete-message retrieval and conservative delivery state handling.
+* ethersms/repository.*: prepared SQLite queries, schema versions 1 and 2,
+  transactional migrations, private database/directory permissions, drafts,
+  local contacts, 200-message history pages, private consistent backup and
+  deletion tombstones. Recovery never automatically requeues a send.
+* ethersms/controller.*: explicit sending, search, contact association, privacy
+  notifications, local draft review, clipboard and explicit speech playback.
+* ethersms/speech.*: visible bounded recording, audio levels, 60-second limit,
+  asynchronous offline recognition, cancellation, silence/error handling,
+  four recognition threads, five-minute timeout and 3 GiB address-space limit.
+* ethersms/ethersms-model: local import and explicitly approved HTTPS downloads,
+  publisher SHA-256 verification, size/redirect limits, atomic installation,
+  installed model listing and removal. English-only models are rejected.
+* ethersms/settings.* and ethershell/qml/SmsSettingsPage.qml: shared preferences
+  and diagnostics inside existing Settings -> Network & Internet -> SMS & Messaging.
+  The Settings transport reads capabilities only, never SMS message bodies.
+* ethersms/Main.qml: real conversation/contact models, phone and desktop layouts,
+  multiline composer, character/segment estimates, unsent dictation, AI comparison,
+  copy, deletion, selection, history navigation and failed-message draft retry.
+* EtherShell notifications now support default open actions. The existing dock's
+  Applications button receives an unread SMS badge without adding a smaller
+  touch target. Its count comes from the running app's session D-Bus service.
+
+Phone-versus-desktop mode follows the window's actual X11 screen. High pixel
+resolution on DSI does not force the desktop layout. Moving to an external screen
+updates that mode. Physical external-display acceptance is still outstanding.
+
+The AI provider is opt-in, uses only loopback Ollama, refuses redirects and shows
+original/proposed text before acceptance. Neither AI nor dictation sends a message.
+SMS text is always plain untrusted text. No message body is written to logs.
+Incoming notification previews follow sender/full/hidden preferences; sender-only
+is the default. No automatic playback, recording or model download is enabled.
+
+An accepted modem submission is labelled Submitted to network, not Delivered.
+Only an unambiguous recipient/reference/time-matched success report can mark
+Delivered, and that state cannot regress. Current-session correlation is lost
+when the modem daemon restarts; unmatched reports never invent confirmation.
+Transport failures without a definitive acknowledgement remain Uncertain and
+have no automatic retry. A Failed message can be restored as a draft for review.
+
+Validation
+----------
+
+The isolated QtTest suite passes on amd64 and on the physical ARM64 phone. It
+covers GSM extension/Unicode segment boundaries, international number preservation,
+SQL input, persistence, crash recovery, backup/no-overwrite, duplicate suppression,
+deleted-message resurrection, future schema refusal, contacts, paginated history,
+explicit sending, monitor-source rejection, incoming plain-text bubbles and
+responsive QML rendering. Test transport and fake audio discovery exist only in
+the test executable and temporary directories, not in the production application.
+See evidence/ethersms-core-device-tests.xml.
+
+Three separate model-helper tests cover checksum failure, atomic installation,
+collisions, path rejection and download consent. See tests/test_ethersms_models.py.
+
+The full existing Settings suite, extended with the SMS route, passes on private
+X11 displays at 360x900, 1000x600 and 1920x1080, in both themes. It also checks
+search navigation, keyboard focus and preference persistence. These are actual
+ARM64 renders against the real modem, with private settings, D-Bus and display
+state. No production network profiles are changed by the tests. See
+``evidence/ethersms-settings-device/acceptance.json`` and adjacent screenshots.
+
+Real phone screenshots are stored as evidence/ethersms-device-pocket.png,
+evidence/ethersms-device-desktop.png and evidence/ethersms-device-settings.png.
+The first two show actual empty history, not fictional conversations. The desktop
+capture is an offscreen layout test on physical ARM64 hardware, not proof of a
+connected EtherAir display.
+
+Native eSpeak NG synthesized fixed test phrases without audible playback:
+Polish 0.033 s / 84,188 PCM bytes, English 0.027 s / 86,584 PCM bytes, 22,050 Hz.
+These numbers measure synthesis, not recognition. Recognition latency, accuracy
+and peak RSS cannot be measured without an approved model and suitable speech
+samples. No recognition benchmark or usable microphone is claimed.
+See evidence/ethersms-speech-regression.json.
+
+Deployment and remaining acceptance
+-----------------------------------
+
+Packages: build/ethersms_0.1.0_arm64.deb,
+build/ethersms-speech-engine_1.9.5~dev-1_arm64.deb and
+build/ethershell-sms_2.1.0_arm64.deb. The first two are installed with dpkg.
+The shell is staged and activated through the existing per-user session launcher,
+with the exact previous launcher preserved and automatic rollback on startup
+failure. Current/previous stages are recorded in
+``evidence/ethersms-shell-deployment.json``. To roll back, restore the recorded
+rollback launcher and use the existing current_session.py stop/start workflow.
+No central AutoUpdate catalogue was published or replaced.
+
+NetworkManager, SSH, Bluetooth, ModemManager, the existing modem service and the
+EtherMobile data adapter remain active. Wi-Fi is intentionally software-disabled
+according to the existing cellular validation, and was preserved in that state.
+No Android, boot, firmware, network profile or kernel changes were made here.
+The final unprivileged cellular regression returned 2/2 ping replies via epcell0;
+see evidence/ethersms-device-final.json. Actual Wi-Fi reconnection, Bluetooth
+pairing, cold boot, suspend/resume, finger
+interaction and physical external-display regressions are not claimed as tested.
+
+Outstanding gates: authorize a chargeable test recipient; observe a real incoming
+SMS; exercise multipart/Unicode/network-loss and delivery-report cases; approve
+an offline model download on a suitable connection; provide a routed microphone;
+benchmark realistic Polish/English speech; verify audible TTS and local Ollama
+suggestions. Full background notification behavior requires EtherSMS to remain
+running. Default sms: URI-handler selection, automated backup import, remote model
+catalogue metadata and delivery-report matching across daemon restarts are not
+implemented. The phone's existing distributor/launcher remains in use.
+
+This release does not yet satisfy the full everyday-use Definition of Done.

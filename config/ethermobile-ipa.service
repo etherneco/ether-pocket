@@ -1,0 +1,15 @@
+[Unit]
+Description=Initialize Qualcomm IPA modem network port
+Requires=etherpocket-modem.service
+After=local-fs.target etherpocket-modem.service
+Before=ModemManager.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/python3 -u /usr/local/lib/ethermobile/ethermobile-ipa-start.py
+RemainAfterExit=yes
+TimeoutStartSec=150
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

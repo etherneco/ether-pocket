@@ -1,0 +1,22 @@
+--- a/arch/arm64/kernel/cpu-reset.h
++++ b/arch/arm64/kernel/cpu-reset.h
+@@ -16,7 +16,7 @@
+ void __cpu_soft_restart(unsigned long el2_switch, unsigned long entry,
+ 	unsigned long arg0, unsigned long arg1, unsigned long arg2);
+ 
+-static inline void __noreturn cpu_soft_restart(unsigned long el2_switch,
++static inline void __noreturn etherpocket_cpu_soft_restart(unsigned long el2_switch,
+ 	unsigned long entry, unsigned long arg0, unsigned long arg1,
+ 	unsigned long arg2)
+ {
+--- a/arch/arm64/kernel/machine_kexec.c
++++ b/arch/arm64/kernel/machine_kexec.c
+@@ -207,7 +207,7 @@
+ 	 * relocation is complete.
+ 	 */
+ 
+-	cpu_soft_restart(kimage != kexec_crash_image,
++	etherpocket_cpu_soft_restart(kimage != kexec_crash_image,
+ 		reboot_code_buffer_phys, kimage->head, kimage->start, 0);
+ 
+ 	BUG(); /* Should never get here. */

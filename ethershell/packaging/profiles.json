@@ -1,0 +1,231 @@
+{
+  "schema": 1,
+  "gestures": {
+    "start": 0.08,
+    "end": 0.92
+  },
+  "generic": {
+    "name": "Generic X11 Application",
+    "geometry": "maximize",
+    "scale": "system",
+    "keyboard": "manual",
+    "orientation": "follow-display",
+    "external": "desktop",
+    "touch": "dock-controls",
+    "decoration": "surface",
+    "placement": "phone"
+  },
+  "profiles": [
+    {
+      "name": "Firefox",
+      "classes": [
+        "firefox-esr",
+        "firefox",
+        "Navigator"
+      ],
+      "desktop": "firefox-esr.desktop",
+      "geometry": "maximize",
+      "scale": "system-dpi",
+      "keyboard": "manual",
+      "orientation": "follow-display",
+      "external": "desktop",
+      "touch": "xinput2,touch-density,tab-controls",
+      "launchEnvironment": {
+        "MOZ_USE_XINPUT2": "1"
+      },
+      "decoration": "surface",
+      "placement": "phone"
+    },
+    {
+      "name": "Terminal",
+      "classes": [
+        "Xfce4-terminal",
+        "XTerm",
+        "UXTerm"
+      ],
+      "desktop": "xfce4-terminal.desktop",
+      "geometry": "maximize",
+      "scale": "Monospace 12",
+      "keyboard": "terminal",
+      "orientation": "follow-display",
+      "external": "desktop",
+      "touch": "scroll-buttons,copy-paste",
+      "launchEnvironment": {},
+      "decoration": "surface",
+      "placement": "phone",
+      "rounding": false
+    },
+    {
+      "name": "File Manager",
+      "classes": [
+        "Thunar"
+      ],
+      "desktop": "thunar.desktop",
+      "geometry": "maximize",
+      "scale": "system-dpi",
+      "keyboard": "manual",
+      "orientation": "follow-display",
+      "external": "desktop",
+      "touch": "dock-controls",
+      "launchEnvironment": {},
+      "decoration": "surface",
+      "placement": "phone"
+    },
+    {
+      "name": "Settings",
+      "classes": [
+        "Xfce4-settings-manager",
+        "Xfce4-display-settings",
+        "Pavucontrol",
+        "Nm-connection-editor",
+        "Blueman-manager"
+      ],
+      "desktop": "xfce-settings-manager.desktop",
+      "geometry": "maximize",
+      "scale": "system-dpi",
+      "keyboard": "manual",
+      "orientation": "follow-display",
+      "external": "desktop",
+      "touch": "preserve-dialogs",
+      "launchEnvironment": {},
+      "decoration": "surface",
+      "placement": "phone"
+    },
+    {
+      "name": "EtherRemote",
+      "classes": [
+        "EtherRemote",
+        "etherremote"
+      ],
+      "desktop": "etherremote.desktop",
+      "geometry": "maximize",
+      "decoration": "surface",
+      "placement": "phone",
+      "external": "desktop",
+      "scale": "system-dpi",
+      "keyboard": "manual",
+      "orientation": "follow-display",
+      "touch": "surface-controls",
+      "icon": "application-x-executable"
+    },
+    {
+      "name": "EtherMCP",
+      "classes": [
+        "EtherMCP",
+        "ethermcp"
+      ],
+      "desktop": "ethermcp.desktop",
+      "geometry": "maximize",
+      "decoration": "surface",
+      "placement": "phone",
+      "external": "desktop",
+      "scale": "system-dpi",
+      "keyboard": "manual",
+      "orientation": "follow-display",
+      "touch": "surface-controls",
+      "icon": "application-x-executable"
+    },
+    {
+      "name": "EtherDeck",
+      "classes": [
+        "EtherDeck",
+        "etherdeck"
+      ],
+      "desktop": "etherdeck.desktop",
+      "geometry": "maximize",
+      "decoration": "surface",
+      "placement": "phone",
+      "external": "desktop",
+      "scale": "system-dpi",
+      "keyboard": "manual",
+      "orientation": "follow-display",
+      "touch": "surface-controls",
+      "icon": "application-x-executable"
+    },
+    {
+      "name": "EtherAIR",
+      "classes": [
+        "EtherAIR",
+        "etherair"
+      ],
+      "desktop": "etherair.desktop",
+      "geometry": "maximize",
+      "decoration": "surface",
+      "placement": "phone",
+      "external": "desktop",
+      "scale": "system-dpi",
+      "keyboard": "manual",
+      "orientation": "follow-display",
+      "touch": "surface-controls",
+      "icon": "application-x-executable"
+    },
+    {
+      "name": "EtherTrust",
+      "classes": [
+        "EtherTrust",
+        "ethertrust"
+      ],
+      "desktop": "ethertrust.desktop",
+      "geometry": "maximize",
+      "decoration": "surface",
+      "placement": "phone",
+      "external": "desktop",
+      "scale": "system-dpi",
+      "keyboard": "manual",
+      "orientation": "follow-display",
+      "touch": "surface-controls",
+      "icon": "application-x-executable"
+    },
+    {
+      "name": "EtherFleet",
+      "classes": [
+        "EtherFleet",
+        "etherfleet"
+      ],
+      "desktop": "etherfleet.desktop",
+      "geometry": "maximize",
+      "decoration": "surface",
+      "placement": "phone",
+      "external": "desktop",
+      "scale": "system-dpi",
+      "keyboard": "manual",
+      "orientation": "follow-display",
+      "touch": "surface-controls",
+      "icon": "application-x-executable"
+    },
+    {
+      "name": "EtherFiles",
+      "classes": [
+        "etherfiles",
+        "EtherFiles"
+      ],
+      "desktop": "etherfiles.desktop",
+      "geometry": "maximize",
+      "scale": "system-dpi",
+      "keyboard": "manual",
+      "orientation": "follow-display",
+      "external": "desktop",
+      "touch": "native-qml",
+      "decoration": "surface",
+      "placement": "phone",
+      "icon": "etherfiles"
+    },
+    {
+      "name": "EtherPhone",
+      "classes": [
+        "etherphone",
+        "EtherPhone"
+      ],
+      "desktop": "etherphone.desktop",
+      "geometry": "maximize",
+      "scale": "system-dpi",
+      "keyboard": "manual",
+      "orientation": "follow-display",
+      "external": "desktop",
+      "touch": "native-qml",
+      "decoration": "none",
+      "placement": "phone",
+      "icon": "call-start"
+    }
+  ]
+}

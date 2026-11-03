@@ -1,0 +1,24 @@
+# EXPERIMENTAL CONFIGURATION INPUT, NOT A BOOTABLE KERNEL.
+# Apply only to a verified GM1920 source/config combination, then olddefconfig
+# and review the effective .config. This does not enable Freedreno on KGSL or
+# port the board to mainline. Preserve board-specific display, touch and UFS.
+CONFIG_VT=y
+CONFIG_VT_CONSOLE=y
+CONFIG_VT_HW_CONSOLE_BINDING=y
+CONFIG_UNIX98_PTYS=y
+CONFIG_DEVTMPFS=y
+CONFIG_DEVTMPFS_MOUNT=y
+CONFIG_INPUT_EVDEV=y
+CONFIG_UNIX=y
+CONFIG_SYSVIPC=y
+CONFIG_TMPFS=y
+CONFIG_TMPFS_POSIX_ACL=y
+CONFIG_EXT4_FS=y
+CONFIG_EXT4_FS_POSIX_ACL=y
+# RAM-only bring-up rebuilds all code; do not load Android's binary modules.
+# Old vendor absolute CRC relocations are incompatible with the modern linker.
+# CONFIG_MODVERSIONS is not set
+# Native udev does not implement Android's firmware userspace fallback.
+# Missing firmware must fail promptly instead of blocking early driver probes.
+# CONFIG_FW_LOADER_USER_HELPER is not set
+# CONFIG_FW_LOADER_USER_HELPER_FALLBACK is not set

@@ -1,0 +1,29 @@
+[Unit]
+Description=EtherPocket verified update coordinator
+After=network.target dbus.service etherpower.service
+
+[Service]
+Type=dbus
+BusName=com.etherneco.EtherUpdate1
+ExecStart=/usr/bin/python3 -I /usr/share/etherupdate/service.py
+StateDirectory=etherupdate
+StateDirectoryMode=0700
+CacheDirectory=etherupdate
+CacheDirectoryMode=0700
+UMask=0077
+# Credentials are stored in root-only StateDirectory storage. The device's
+# 4.14 kernel cannot run systemd's credential setup (243/CREDENTIALS).
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=1200
+KillMode=mixed
+PrivateTmp=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+# Package management needs the normal root filesystem. No device nodes or raw
+# partition tools are used by any installation strategy.
+
+[Install]
+WantedBy=multi-user.target

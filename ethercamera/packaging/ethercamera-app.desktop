@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=EtherCamera
+Name[pl]=EtherCamera — Aparat
+Comment=Take photos and record video using an available camera
+Comment[pl]=Zdjęcia i filmy z dostępnej kamery
+Exec=ethercamera-app
+TryExec=ethercamera-app
+Icon=camera-photo
+Terminal=false
+Categories=Graphics;Photography;AudioVideo;
+StartupWMClass=ethercamera-app

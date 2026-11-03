@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=EtherShare
+Comment=Internet sharing and hotspot management
+Exec=ethershare
+Icon=ethershare
+Categories=Settings;Network;
+Terminal=false

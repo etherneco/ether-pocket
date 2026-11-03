@@ -1,0 +1,261 @@
+{
+  "schema": 1,
+  "sources": {
+    "personal": {
+      "paths": [
+        "/home/mobian/Documents",
+        "/home/mobian/Downloads",
+        "/home/mobian/Pictures",
+        "/home/mobian/Videos",
+        "/home/mobian/Music",
+        "/home/mobian/Desktop"
+      ],
+      "exclude": [],
+      "consistency": "files-and-sqlite-online",
+      "secrets": "explicit-paths-only",
+      "schemaVersions": [
+        "files-v1"
+      ],
+      "prepare": "regular-file-staging-and-sqlite-online-backup",
+      "complete": "release-source-handles",
+      "restoreValidation": "sha256-and-sqlite-integrity; application health requires offline apply",
+      "applicationApplyCommissioned": false
+    },
+    "ethershell": {
+      "paths": [
+        "/home/mobian/.config/ethershell/preferences.json",
+        "/home/mobian/.config/ethershell/native-frame-settings.json"
+      ],
+      "exclude": [],
+      "consistency": "files-and-sqlite-online",
+      "secrets": "explicit-paths-only",
+      "schemaVersions": [
+        "files-v1"
+      ],
+      "prepare": "regular-file-staging-and-sqlite-online-backup",
+      "complete": "release-source-handles",
+      "restoreValidation": "sha256-and-sqlite-integrity; application health requires offline apply",
+      "applicationApplyCommissioned": false
+    },
+    "ethersms": {
+      "paths": [
+        "/home/mobian/.config/Etherneco/EtherSMS.conf",
+        "/home/mobian/.local/share/Etherneco/EtherSMS/messages.sqlite"
+      ],
+      "exclude": [],
+      "consistency": "files-and-sqlite-online",
+      "secrets": "explicit-paths-only",
+      "schemaVersions": [
+        1,
+        2
+      ],
+      "prepare": "regular-file-staging-and-sqlite-online-backup",
+      "complete": "release-source-handles",
+      "restoreValidation": "sha256-and-sqlite-integrity; application health requires offline apply",
+      "applicationApplyCommissioned": false
+    },
+    "etherphone": {
+      "paths": [
+        "/home/mobian/.config/etherphone/settings.json",
+        "/home/mobian/.local/share/ethercontacts/contacts.sqlite",
+        "/home/mobian/.local/share/etherphone/history.sqlite"
+      ],
+      "exclude": [],
+      "consistency": "files-and-sqlite-online",
+      "secrets": "explicit-paths-only",
+      "schemaVersions": [
+        0
+      ],
+      "prepare": "regular-file-staging-and-sqlite-online-backup",
+      "complete": "release-source-handles",
+      "restoreValidation": "sha256-and-sqlite-integrity; application health requires offline apply",
+      "applicationApplyCommissioned": false
+    },
+    "ethernotifications": {
+      "paths": [
+        "/home/mobian/.local/state/ethernotifications/history.sqlite"
+      ],
+      "exclude": [],
+      "consistency": "files-and-sqlite-online",
+      "secrets": "explicit-paths-only",
+      "schemaVersions": [
+        0
+      ],
+      "prepare": "regular-file-staging-and-sqlite-online-backup",
+      "complete": "release-source-handles",
+      "restoreValidation": "sha256-and-sqlite-integrity; application health requires offline apply",
+      "applicationApplyCommissioned": false
+    },
+    "etherlocation": {
+      "paths": [
+        "/home/mobian/.local/share/etherlocation/settings.json"
+      ],
+      "exclude": [],
+      "consistency": "files-and-sqlite-online",
+      "secrets": "explicit-paths-only",
+      "schemaVersions": [
+        "files-v1"
+      ],
+      "prepare": "regular-file-staging-and-sqlite-online-backup",
+      "complete": "release-source-handles",
+      "restoreValidation": "sha256-and-sqlite-integrity; application health requires offline apply",
+      "applicationApplyCommissioned": false
+    },
+    "ethercamera": {
+      "paths": [
+        "/home/mobian/Pictures/EtherCamera"
+      ],
+      "exclude": [],
+      "consistency": "files-and-sqlite-online",
+      "secrets": "explicit-paths-only",
+      "schemaVersions": [
+        "files-v1"
+      ],
+      "prepare": "regular-file-staging-and-sqlite-online-backup",
+      "complete": "release-source-handles",
+      "restoreValidation": "sha256-and-sqlite-integrity; application health requires offline apply",
+      "applicationApplyCommissioned": false
+    },
+    "ethersensors": {
+      "paths": [],
+      "exclude": [],
+      "consistency": "static-files",
+      "secrets": "explicit-paths-only",
+      "schemaVersions": [
+        "files-v1"
+      ],
+      "prepare": "regular-file-staging-and-sqlite-online-backup",
+      "complete": "release-source-handles",
+      "restoreValidation": "sha256-and-sqlite-integrity; application health requires offline apply",
+      "applicationApplyCommissioned": false
+    },
+    "etherpower": {
+      "paths": [
+        "/var/lib/etherpower/config.json"
+      ],
+      "exclude": [],
+      "consistency": "files-and-sqlite-online",
+      "secrets": "explicit-paths-only",
+      "schemaVersions": [
+        "files-v1"
+      ],
+      "prepare": "regular-file-staging-and-sqlite-online-backup",
+      "complete": "release-source-handles",
+      "restoreValidation": "sha256-and-sqlite-integrity; application health requires offline apply",
+      "applicationApplyCommissioned": false
+    },
+    "etherlock": {
+      "paths": [
+        "/home/mobian/.config/etherlock/policy.json"
+      ],
+      "exclude": [],
+      "consistency": "static-files",
+      "secrets": "explicit-paths-only",
+      "schemaVersions": [
+        "files-v1"
+      ],
+      "prepare": "regular-file-staging-and-sqlite-online-backup",
+      "complete": "release-source-handles",
+      "restoreValidation": "sha256-and-sqlite-integrity; application health requires offline apply",
+      "applicationApplyCommissioned": false
+    },
+    "etherupdate": {
+      "paths": [
+        "/var/lib/etherupdate/history.sqlite",
+        "/etc/etherupdate/policy.json",
+        "/etc/etherupdate/trusted-keys.json"
+      ],
+      "exclude": [],
+      "consistency": "files-and-sqlite-online",
+      "secrets": "explicit-paths-only",
+      "schemaVersions": [
+        0
+      ],
+      "prepare": "regular-file-staging-and-sqlite-online-backup",
+      "complete": "release-source-handles",
+      "restoreValidation": "sha256-and-sqlite-integrity; application health requires offline apply",
+      "applicationApplyCommissioned": false
+    },
+    "system": {
+      "paths": [
+        "/etc/fstab",
+        "/etc/hostname",
+        "/etc/hosts",
+        "/etc/passwd",
+        "/etc/group",
+        "/etc/NetworkManager/system-connections",
+        "/etc/systemd/system",
+        "/etc/etherpocket/boot-images.json",
+        "/etc/etherpocket/disk-identity"
+      ],
+      "exclude": [],
+      "consistency": "files-and-sqlite-online",
+      "secrets": "explicit-paths-only",
+      "schemaVersions": [
+        "files-v1"
+      ],
+      "prepare": "regular-file-staging-and-sqlite-online-backup",
+      "complete": "release-source-handles",
+      "restoreValidation": "sha256-and-sqlite-integrity; application health requires offline apply",
+      "applicationApplyCommissioned": false
+    }
+  },
+  "profiles": {
+    "personal": [
+      "personal"
+    ],
+    "applications": [
+      "ethershell",
+      "ethersms",
+      "etherphone",
+      "ethernotifications",
+      "etherlocation",
+      "ethercamera",
+      "ethersensors",
+      "etherpower",
+      "etherlock",
+      "etherupdate"
+    ],
+    "configuration": [
+      "system",
+      "etherpower",
+      "etherlock",
+      "etherupdate"
+    ],
+    "complete": [
+      "personal",
+      "ethershell",
+      "ethersms",
+      "etherphone",
+      "ethernotifications",
+      "etherlocation",
+      "ethercamera",
+      "ethersensors",
+      "etherpower",
+      "etherlock",
+      "etherupdate",
+      "system"
+    ]
+  },
+  "destinations": {},
+  "updateDestination": null,
+  "updateComponents": {},
+  "retention": {
+    "daily": 7,
+    "weekly": 4,
+    "monthly": 6,
+    "automatic": false
+  },
+  "schedule": {
+    "enabled": false,
+    "profile": "personal",
+    "destination": null,
+    "chargingOnly": true,
+    "wifiConnection": null
+  },
+  "maxStageBytes": 17179869184,
+  "maxFiles": 100000,
+  "overdueSeconds": 172800,
+  "updateSafetySeconds": 2592000,
+  "sessionUid": 1000
+}

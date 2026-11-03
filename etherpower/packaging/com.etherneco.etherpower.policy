@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN" "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+ <vendor>Etherneco LTD</vendor>
+ <action id="com.etherneco.etherpower.manage">
+  <description>Change verified EtherPocket power settings</description>
+  <message>Authenticate to change CPU/GPU power profiles or saved battery policies</message>
+  <defaults><allow_any>no</allow_any><allow_inactive>no</allow_inactive><allow_active>auth_admin_keep</allow_active></defaults>
+ </action>
+ <action id="com.etherneco.etherpower.power-action">
+  <description>Request sleep, shutdown or restart through logind</description>
+  <message>Authenticate for the requested system power action</message>
+  <defaults><allow_any>no</allow_any><allow_inactive>no</allow_inactive><allow_active>auth_admin</allow_active></defaults>
+ </action>
+</policyconfig>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN" "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+ <vendor>Etherneco LTD</vendor>
+ <action id="com.etherneco.etherbackup.inspect"><description>View private backup details</description><message>Authenticate to inspect backup repositories and history</message><defaults><allow_any>no</allow_any><allow_inactive>no</allow_inactive><allow_active>auth_admin</allow_active></defaults></action>
+ <action id="com.etherneco.etherbackup.manage"><description>Manage encrypted backups</description><message>Authenticate to create or verify backups</message><defaults><allow_any>no</allow_any><allow_inactive>no</allow_inactive><allow_active>auth_admin</allow_active></defaults></action>
+ <action id="com.etherneco.etherbackup.restore"><description>Restore private backup data</description><message>Authenticate to preview or restore backup data into a private directory</message><defaults><allow_any>no</allow_any><allow_inactive>no</allow_inactive><allow_active>auth_admin</allow_active></defaults></action>
+</policyconfig>

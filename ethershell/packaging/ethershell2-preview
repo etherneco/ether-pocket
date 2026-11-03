@@ -1,0 +1,4 @@
+#!/bin/sh
+set -eu
+[ "$#" -gt 0 ] || set -- start
+exec python3 /usr/share/ethershell/development.py "$@"

@@ -1,0 +1,21 @@
+--- a/arch/arm64/kernel/vmlinux.lds.S
++++ b/arch/arm64/kernel/vmlinux.lds.S
+@@ -5,6 +5,8 @@
+  * Written by Martin Mares <mj@atrey.karlin.mff.cuni.cz>
+  */
+ 
++/* Keep RTIC data inside the allocated, zeroed kernel BSS. */
++#define BSS_FIRST_SECTIONS RTIC_BSS
+ #include <asm-generic/vmlinux.lds.h>
+ #include <asm/cache.h>
+ #include <asm/kernel-pgtable.h>
+@@ -245,9 +247,6 @@
+ 
+ 	HEAD_SYMBOLS
+ 
+-	.bss : {			/* bss segment		*/
+-         RTIC_BSS
+-	}
+ }
+ 
+ /*

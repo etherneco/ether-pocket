@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=EtherShell 2 Preview
+Comment=Open the isolated touch-first EtherShell development session
+Exec=ethershell2-preview
+TryExec=Xephyr
+Icon=preferences-desktop
+Terminal=false
+Categories=System;

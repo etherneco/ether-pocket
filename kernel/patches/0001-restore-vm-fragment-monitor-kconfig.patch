@@ -1,0 +1,10 @@
+--- /dev/null
++++ b/drivers/vm_fragment_monitor/Kconfig
+@@ -0,0 +1,7 @@
++config VM_FRAGMENT_MONITOR
++	bool "OnePlus virtual-memory fragmentation monitor"
++	default n
++	help
++	  Build the vendor vm_fragment_monitor driver. The public source
++	  release includes the implementation and Makefile but omits this
++	  Kconfig declaration, which is sourced by drivers/Kconfig.

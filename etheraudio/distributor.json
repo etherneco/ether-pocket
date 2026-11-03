@@ -1,0 +1,1 @@
+{"schemaVersion":1,"name":"EtherAudio","slug":"etheraudio","version":"0.1.1","platform":"linux","architecture":"arm64","format":"deb","package":"etheraudio_0.1.1_arm64.deb","settingsRoute":"sound","service":"com.etherneco.EtherAudio1","publication":"Local package; uses existing distributor"}

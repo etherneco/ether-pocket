@@ -1,0 +1,61 @@
+--- a/kernel/Makefile
++++ b/kernel/Makefile
+@@ -16,7 +16,8 @@
+ obj-$(CONFIG_MULTIUSER) += groups.o
+ 
+ # [OSP-3675]: ext4 fsync
+-obj-y += panic_flush.o
++# panic_flush.c was omitted from the public vendor source.
++# RAM-only native tests retain standard panic and SysRq behavior.
+ 
+ ifdef CONFIG_FUNCTION_TRACER
+ # Do not trace internal ftrace files
+--- a/kernel/panic.c
++++ b/kernel/panic.c
+@@ -195,9 +195,6 @@
+ 	vsnprintf(buf, sizeof(buf), fmt, args);
+ 	va_end(args);
+ 	dump_stack_minidump(0);
+-	/* [OSP-3675]: ext4 fsync */
+-	if (!get_download_mode())
+-		panic_flush_device_cache(2000);
+ 	pr_emerg("Kernel panic - not syncing: %s\n", buf);
+ 	function_name = parse_function_builtin_return_address((unsigned long)__builtin_return_address(0));
+ 	save_dump_reason_to_smem(buf, function_name);
+--- a/init/initramfs.c
++++ b/init/initramfs.c
+@@ -609,11 +609,23 @@
+ #endif
+ 
+ static int __initdata do_skip_initramfs;
++static int __initdata etherpocket_ramboot;
++
++/* Preserve stock skip_initramfs behavior unless a native RAM test opts in. */
++static int __init etherpocket_ramboot_param(char *str)
++{
++    if (str && !strcmp(str, "1"))
++        etherpocket_ramboot = 1;
++    return 0;
++}
++early_param("etherpocket.ramboot", etherpocket_ramboot_param);
+ 
+ static int __init skip_initramfs_param(char *str)
+ {
+ 	if (*str)
+ 		return 0;
++	if (etherpocket_ramboot)
++		return 1;
+ 	do_skip_initramfs = 1;
+ 	return 1;
+ }
+--- a/drivers/tty/sysrq.c
++++ b/drivers/tty/sysrq.c
+@@ -170,7 +170,7 @@
+ /* [OSP-3675]: ext4 fsync */
+ static void sysrq_handle_flush(int key)
+ {
+-	panic_flush_device_cache(0);
++	emergency_sync(); /* Standard sync; omitted vendor implementation unavailable. */
+ }
+ 
+ /* [OSP-3675]: ext4 fsync */

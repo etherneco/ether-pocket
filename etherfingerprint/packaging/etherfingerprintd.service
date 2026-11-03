@@ -1,0 +1,22 @@
+[Unit]
+Description=EtherFingerprint read-only hardware diagnostics (authentication disabled)
+After=dbus.service
+
+[Service]
+Type=dbus
+BusName=com.etherneco.EtherFingerprint1
+User=etherfp
+ExecStart=/usr/bin/python3 /usr/share/etherfingerprint/service.py
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+DevicePolicy=closed
+CapabilityBoundingSet=
+RestrictAddressFamilies=AF_UNIX
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

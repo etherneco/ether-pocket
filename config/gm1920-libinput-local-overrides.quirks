@@ -1,0 +1,3 @@
+[GM1920 downstream touchpanel invalid width axes]
+MatchName=touchpanel
+AttrEventCode=-ABS_MT_WIDTH_MAJOR;-ABS_MT_WIDTH_MINOR;

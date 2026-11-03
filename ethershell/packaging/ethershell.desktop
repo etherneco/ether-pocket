@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=EtherShell
+Comment=Native touch desktop and EtherKeyboard
+Exec=ethershell
+Icon=preferences-desktop
+Categories=System;
+Terminal=false

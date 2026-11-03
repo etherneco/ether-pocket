@@ -1,0 +1,18 @@
+[Unit]
+Description=EtherCamera managed capture service
+After=dbus.service etherlock.service
+Wants=etherlock.service
+
+[Service]
+Type=dbus
+BusName=com.etherneco.EtherCamera1
+ExecStart=/usr/bin/python3 /usr/share/ethercamera/service.py
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=yes
+ProtectSystem=full
+RestrictAddressFamilies=AF_UNIX
+
+[Install]
+WantedBy=default.target

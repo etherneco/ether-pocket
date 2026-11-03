@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=EtherMAP
+Comment=Private OpenStreetMap maps and local tracks
+Exec=ethermap
+Icon=mark-location
+Terminal=false
+Categories=Utility;Maps;Geography;
+StartupWMClass=ethermap

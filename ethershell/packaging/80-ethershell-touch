@@ -1,0 +1,6 @@
+# Native XInput2 touch for applications started by either XFCE or EtherShell.
+# Sourced by Xsession; do not detach the touchscreen from the core pointer:
+# legacy X11 applications still need Xorg's compatibility events for taps.
+export MOZ_USE_XINPUT2=1
+export QT_QUICK_CONTROLS_MOBILE=1
+unset GDK_CORE_DEVICE_EVENTS QT_XCB_NO_XI2 QT_XCB_NO_TOUCH

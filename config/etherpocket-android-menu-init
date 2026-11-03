@@ -1,0 +1,90 @@
+#!/bin/busybox sh
+# Experimental stock-kernel menu, tested via Fastboot before installation.
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+mount -t tmpfs tmpfs /dev
+mknod /dev/null c 1 3
+mknod /dev/zero c 1 5
+mknod /dev/random c 1 8
+mknod /dev/urandom c 1 9
+mknod /dev/tty c 5 0
+mdev -s
+mkdir -p /run /dev/pts /newroot
+mount -t tmpfs tmpfs /run
+mount -t devpts devpts /dev/pts
+mkdir -p /sys/fs/pstore
+mount -t pstore pstore /sys/fs/pstore
+for part in /sys/class/block/*; do
+    label=$(sed -n 's/^PARTNAME=//p' "$part/uevent")
+    [ -z "$label" ] && continue
+    mkdir -p /dev/disk/by-partlabel
+    ln -sf "/dev/${part##*/}" "/dev/disk/by-partlabel/$label"
+done
+mkdir -p /mobian
+mount -t ext4 -o ro /dev/sda21 /mobian
+if [ "$(cat /mobian/etc/etherpocket/disk-identity 2>/dev/null)" != GM1920-548cb338-mobian-sda21 ]; then
+    umount /mobian
+fi
+marker=/mobian/var/lib/etherpocket/next-system
+if [ -f /mobian/etc/etherpocket/bootmenu-debug ]; then
+    /usr/local/sbin/etherpocket-usb-debug > /run/usb-debug.log 2>&1 &
+    /usr/sbin/dropbear -E -s -r /etc/dropbear/dropbear_ed25519_host_key
+fi
+if [ "$(cat "$marker" 2>/dev/null)" = Android ]; then
+    mount -o remount,rw /mobian
+    rm "$marker"
+    sync
+    mount -o remount,ro /mobian
+    touch /run/android-test
+fi
+start_android() {
+    grep -q 'androidboot.slot_suffix=_b' /proc/cmdline || return 1
+    mkdir -p /dev/mapper
+    pair=$(cat /sys/class/misc/device-mapper/dev)
+    mknod /dev/mapper/control c "${pair%:*}" "${pair#*:}"
+    /usr/sbin/android-verity-root >> /run/bootmenu.log 2>&1 || return 1
+    mdev -s
+    mount -t ext4 -o ro /dev/dm-0 /newroot || return 1
+    [ -x /newroot/system/bin/init ] || return 1
+    killall dropbear udhcpd 2>/dev/null || true
+    gadget=/sys/kernel/config/usb_gadget/etherpocket
+    if [ -d "$gadget" ]; then
+        echo '' > "$gadget/UDC"
+        rm "$gadget/configs/c.1/rndis.usb0" "$gadget/os_desc/c.1"
+        rmdir "$gadget/configs/c.1/strings/0x409" "$gadget/configs/c.1" \
+            "$gadget/functions/rndis.usb0" "$gadget/strings/0x409" "$gadget"
+        umount /sys/kernel/config
+    fi
+    umount /mobian
+    # Android FirstStageMain creates its own /dev, /proc and /sys mounts.
+    # Moving ours into its root makes those mounts fail with EBUSY.
+    umount -l /dev/pts
+    umount -l /dev
+    umount -l /sys
+    umount -l /proc
+    umount -l /run
+    exec /bin/busybox switch_root /newroot /init
+}
+while :; do
+    if [ -f /run/android-test ]; then
+        rm /run/android-test
+        start_android >> /run/bootmenu.log 2>&1
+    fi
+    /usr/bin/etherpocket-bootmenu /usr/share/etherpocket/bootmenu 0 1 >> /run/bootmenu.log 2>&1
+    result=$?
+    echo "Stock menu result=$result" >> /run/bootmenu.log
+    case "$result" in
+        10) start_android ;;
+        0)
+            if [ "$(cat /mobian/etc/etherpocket/disk-identity 2>/dev/null)" = GM1920-548cb338-mobian-sda21 ] && mount -o remount,rw /mobian; then
+                printf 'etherPocket\n' > "$marker.new"
+                mv "$marker.new" "$marker"
+                sync
+                mount -o remount,ro /mobian
+                /usr/sbin/etherpocket-slotctl -s a >> /run/bootmenu.log 2>&1 && reboot -f
+            fi
+            ;;
+    esac
+    sleep 2
+done

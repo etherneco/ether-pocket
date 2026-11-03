@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=EtherLocation Maps
+Comment=Private positioning and licensed offline maps
+Exec=etherlocation-map
+Icon=mark-location
+Categories=Utility;Maps;

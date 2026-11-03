@@ -1,0 +1,109 @@
+#!/usr/bin/python3
+"""Reversible user-level appearance/terminal preferences; never runs as root."""
+import argparse
+import base64
+import configparser
+import json
+import os
+from pathlib import Path
+import subprocess
+import fcntl
+
+def run(*args, check=True):
+    return subprocess.run(args, text=True, capture_output=True, timeout=8, check=check)
+
+def main():
+    if os.geteuid() == 0:
+        raise SystemExit('Run as the desktop user')
+    parser = argparse.ArgumentParser()
+    parser.add_argument('action', choices=['light', 'dark', 'restore'])
+    args = parser.parse_args()
+    config = Path(os.environ.get('XDG_CONFIG_HOME', Path.home()/'.config'))
+    backup = config/'ethershell/application-settings-backup.json'
+    backup.parent.mkdir(parents=True, exist_ok=True)
+    lock = (backup.parent/'application-settings.lock').open('w')
+    fcntl.flock(lock, fcntl.LOCK_EX)
+    values = [
+        ('xsettings', '/Net/ThemeName', 'string', 'Adwaita-dark' if args.action == 'dark' else 'Adwaita'),
+        ('xsettings', '/Net/IconThemeName', 'string', 'Adwaita'),
+        ('xsettings', '/Gtk/CursorThemeName', 'string', 'Adwaita'),
+        ('xsettings', '/Gtk/CursorThemeSize', 'int', '48'),
+        ('xfwm4', '/general/theme', 'string', 'Default-xhdpi'),
+        ('xfce4-terminal', '/font-name', 'string', 'Monospace 12'),
+        ('xfce4-terminal', '/font-use-system', 'bool', 'false'),
+        ('xfce4-terminal', '/misc-default-geometry', 'string', '48x24'),
+        ('xfce4-terminal', '/misc-menubar-default', 'bool', 'false'),
+        ('xfce4-terminal', '/misc-toolbar-default', 'bool', 'false'),
+        ('xfce4-terminal', '/scrolling-bar', 'string', 'TERMINAL_SCROLLBAR_RIGHT'),
+        ('xfce4-terminal', '/scrolling-lines', 'uint', '10000'),
+    ]
+    profiles = config/'ethershell/profiles.json'
+    if os.environ.get('ETHERSHELL_NATIVE_FRAMES')=='1':
+        values=[entry for entry in values if not (entry[0]=='xfwm4' and entry[1]=='/general/theme')]
+    if not profiles.exists():
+        profiles = Path(os.environ.get('ETHERSHELL_PROFILE_DEFAULT','/usr/share/ethershell/profiles.json'))
+    data = {} if args.action == 'restore' else json.loads(profiles.read_text())
+    terminal_font = next((p.get('scale', 'Monospace 12') for p in data.get('profiles', []) if p.get('name') == 'Terminal'), 'Monospace 12')
+    # Font names are passed as an argv value, never shell-expanded.
+    values = [(ch, key, kind, terminal_font if ch == 'xfce4-terminal' and key == '/font-name' else value) for ch, key, kind, value in values]
+    paths = ['xfce4/terminal/terminalrc', 'gtk-3.0/settings.ini', 'gtk-4.0/settings.ini']
+    if args.action == 'restore':
+        if not backup.exists():
+            return
+        saved = json.loads(backup.read_text())
+        for item in saved['xfconf']:
+            ch, key, kind, value = item
+            if value is None:
+                run('xfconf-query', '-c', ch, '-p', key, '-r', check=False)
+            else:
+                run('xfconf-query', '-c', ch, '-p', key, '-n', '-t', kind, '-s', value)
+        for name, value in saved['files'].items():
+            path = config/name
+            if value is None:
+                path.unlink(missing_ok=True)
+            else:
+                path.parent.mkdir(parents=True, exist_ok=True)
+                path.write_bytes(base64.b64decode(value))
+        return
+    if not backup.exists():
+        saved = {'xfconf': [], 'files': {}}
+        for ch, key, kind, value in values:
+            old = run('xfconf-query', '-c', ch, '-p', key, check=False)
+            saved['xfconf'].append([ch, key, kind, old.stdout.rstrip('\n') if old.returncode == 0 else None])
+        for name in paths:
+            path = config/name
+            saved['files'][name] = base64.b64encode(path.read_bytes()).decode() if path.exists() else None
+        backup.parent.mkdir(parents=True, exist_ok=True)
+        backup.write_text(json.dumps(saved, indent=2))
+        backup.chmod(0o600)
+    else:
+        saved = json.loads(backup.read_text())
+        keys = {(item[0], item[1]) for item in saved['xfconf']}
+        for ch, key, kind, value in values:
+            if (ch, key) not in keys:
+                old = run('xfconf-query', '-c', ch, '-p', key, check=False)
+                saved['xfconf'].append([ch, key, kind, old.stdout.rstrip('\n') if old.returncode == 0 else None])
+        backup.write_text(json.dumps(saved, indent=2))
+    for ch, key, kind, value in values:
+        run('xfconf-query', '-c', ch, '-p', key, '-n', '-t', kind, '-s', value)
+    for name in paths:
+        path = config/name
+        settings = configparser.ConfigParser(interpolation=None, strict=False)
+        settings.optionxform = str
+        if path.exists():
+            settings.read(path)
+        section = 'Configuration' if 'terminalrc' in name else 'Settings'
+        if not settings.has_section(section):
+            settings.add_section(section)
+        if section == 'Configuration':
+            settings[section].update({'FontName': terminal_font, 'FontUseSystem': 'FALSE', 'ScrollingBar': 'TERMINAL_SCROLLBAR_RIGHT', 'ScrollingLines': '10000', 'MiscDefaultGeometry': '48x24', 'MiscMenubarDefault': 'FALSE', 'MiscToolbarDefault': 'FALSE'})
+        else:
+            settings[section].update({'gtk-theme-name': 'Adwaita-dark' if args.action == 'dark' else 'Adwaita', 'gtk-application-prefer-dark-theme': 'true' if args.action == 'dark' else 'false', 'gtk-icon-theme-name': 'Adwaita', 'gtk-cursor-theme-name': 'Adwaita', 'gtk-cursor-theme-size': '48'})
+        path.parent.mkdir(parents=True, exist_ok=True)
+        temp = path.with_suffix('.ethershell-tmp')
+        with temp.open('w') as stream:
+            settings.write(stream, space_around_delimiters=False)
+        temp.replace(path)
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,4 @@
+# GM1920 vendor kernel: IPA exposes its real raw-IP netdev under virtual/net,
+# without a driver ancestor, so upstream DRIVERS=="ipa" cannot match it.
+# Install only after board/driver/IPA initialization checks on the target.
+ACTION=="add|change|move", SUBSYSTEM=="net", DEVPATH=="/devices/virtual/net/rmnet_ipa0", ATTR{type}=="519", ENV{ID_MM_QCOM_SOC}="1", ENV{ID_MM_PHYSDEV_UID}="qcom-soc", ENV{ID_MM_CANDIDATE}="1"

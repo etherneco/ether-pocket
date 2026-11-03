@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "EtherSMS preferences",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "notifications": {"type": "boolean", "default": true},
+    "preview": {"enum": ["sender", "full", "hidden"], "default": "sender"},
+    "deliveryReports": {"type": "boolean", "default": false},
+    "confirmSend": {"type": "boolean", "default": true},
+    "dictation": {"type": "boolean", "default": true},
+    "language": {"enum": ["pl", "en", "auto"], "default": "pl"},
+    "microphone": {"type": "string", "maxLength": 512, "default": ""},
+    "speechModel": {"type": "string", "default": "ggml-base.bin"},
+    "aiEnabled": {"type": "boolean", "default": false},
+    "aiModel": {"type": "string", "maxLength": 512, "default": ""},
+    "ttsEnabled": {"type": "boolean", "default": false},
+    "ttsVoice": {"enum": ["pl", "en"], "default": "pl"},
+    "ttsRate": {"type": "integer", "minimum": 80, "maximum": 300, "default": 165},
+    "outputDevice": {"type": "string", "maxLength": 512, "default": ""}
+  }
+}

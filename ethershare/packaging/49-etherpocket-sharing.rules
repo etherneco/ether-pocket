@@ -1,0 +1,5 @@
+// Physical EtherPocket owner integration; generic installation does not enable it.
+polkit.addRule(function(action, subject) {
+    if (action.id == "com.etherneco.ethershare.manage" && subject.user == "mobian")
+        return polkit.Result.YES;
+});

@@ -1,0 +1,14 @@
+[Unit]
+Description=EtherPocket Qualcomm internal audio
+Requires=pd-mapper.service
+After=pd-mapper.service tqftpserv.service
+Before=lightdm.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/etherpocket-audio-start
+RemainAfterExit=yes
+TimeoutStartSec=50
+
+[Install]
+WantedBy=multi-user.target

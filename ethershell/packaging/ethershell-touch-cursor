@@ -1,0 +1,5 @@
+#!/bin/sh
+# One cursor manager per desktop session, shared by XFCE and EtherShell.
+set -eu
+exec flock -n "${XDG_RUNTIME_DIR:?}/ethershell-touch-cursor.lock" \
+    /usr/bin/unclutter-xfixes --hide-on-touch --start-hidden --timeout 3600

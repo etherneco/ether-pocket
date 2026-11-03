@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=EtherCamera Media
+Comment=Private photos, videos and scanned documents
+Exec=ethercamera-media
+Icon=image-x-generic
+Terminal=false
+Categories=Graphics;Photography;

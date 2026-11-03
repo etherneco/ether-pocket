@@ -1,0 +1,30 @@
+[Unit]
+Description=EtherPocket read-only hardware capability registry
+After=dbus.service
+
+[Service]
+Type=dbus
+BusName=com.etherneco.EtherHardware1
+User=etherhardware
+Group=etherhardware
+SupplementaryGroups=video audio input render
+ExecStart=/usr/bin/python3 /usr/share/etherhardware/service.py
+StateDirectory=etherhardware
+StateDirectoryMode=0700
+UMask=0077
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+PrivateTmp=yes
+RestrictAddressFamilies=AF_UNIX AF_NETLINK AF_QIPCRTR
+CapabilityBoundingSet=
+LockPersonality=yes
+RestrictSUIDSGID=yes
+
+[Install]
+WantedBy=multi-user.target

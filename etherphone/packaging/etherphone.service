@@ -1,0 +1,13 @@
+[Unit]
+Description=EtherPhone native telephony session service
+After=dbus.service
+[Service]
+Type=dbus
+BusName=com.etherneco.EtherPhone1
+ExecStart=/usr/bin/python3 /usr/share/etherphone/service.py
+Restart=on-failure
+RestartSec=3
+UMask=0077
+NoNewPrivileges=yes
+[Install]
+WantedBy=default.target

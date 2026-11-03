@@ -1,0 +1,31 @@
+[Unit]
+Description=EtherPocket encrypted backup and isolated restore coordinator
+After=dbus.service etherpower.service
+
+[Service]
+Type=dbus
+BusName=com.etherneco.EtherBackup1
+ExecStart=/usr/bin/python3 -I /usr/share/etherbackup/service.py
+StateDirectory=etherbackup
+StateDirectoryMode=0700
+UMask=0077
+Restart=on-failure
+RestartSec=10
+TimeoutStopSec=90
+KillMode=control-group
+Nice=15
+IOSchedulingClass=idle
+MemoryMax=768M
+TasksMax=64
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+# PrivateDevices exposes no real block nodes. No partition-writing tool is used.
+# The Android 4.14 kernel cannot use systemd's credential mounting feature.
+
+[Install]
+WantedBy=multi-user.target

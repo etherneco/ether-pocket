@@ -1,0 +1,80 @@
+Native Mobian Wi-Fi — 2026-10-15
+===============================
+
+Device: GM1920 / 548cb338, native Mobian on sda21, kernel
+4.14.117-perf. The original rootfs had NetworkManager and wpa_supplicant
+but no WLAN module or device firmware.
+
+Installed components
+--------------------
+
+* qcacld-3.0 and its matching qca-wifi-host-cmn/fw-api sources from
+  LineageOS/android_kernel_oneplus_sm8150, lineage-17.1 commit
+  77a0c0f8a59c868236c495373d98b03a819c0108, built against the existing
+  /opt/etherpocket/kernel and /opt/etherpocket/out with GCC 12. The module
+  is signed with this kernel build's existing signing key. Build entry:
+  scripts/build-wifi-driver.sh. Installed as
+  /lib/modules/4.14.117-perf/extra/wlan.ko, followed by depmod.
+* Firmware copied from the phone's modem_b partition to /lib/firmware.
+  WCNSS_qcom_cfg.ini comes from vendor_b/etc/wifi; wlan_mac.bin comes
+  from persist. All source partitions were mounted read-only. Boot uses
+  the copied files and does not require Android partitions to be mounted.
+* Debian arm64 libqrtr1 and qrtr-tools 1.1-2+b1, rmtfs
+  1.3-1~bpo13+1, tqftpserv 1.1-4 and protection-domain-mapper 1.0-7.
+  rmtfs uses -r -P: partition data is read into RAM and changes stay in
+  RAM. Android modem/NV partitions are not written. Version 1.3 includes
+  the OnePlus OEM NV partition mappings required by this firmware.
+* Native pd-mapper 1.0 and tqftpserv commit
+  5ad084be8e29bee2dc2dcc336f75d6343fb9f076, adapted to discover firmware
+  through /run/etherpocket/remoteproc because this downstream kernel
+  exposes msm_subsys instead of mainline remoteproc. tqftpserv also
+  supports the firmware's /readonly/vendor paths.
+* scripts/qrtr-downstream-publish.c provides server node/port fields
+  required by the downstream QRTR routing filter once the modem node
+  exists. It is preloaded only into the three Qualcomm services.
+* scripts/etherpocket-wlfw.py supplies board data and the calibration
+  report using the kernel source's WLFW QMI protocol. Firmware without
+  a board ID uses bdwlan.bin. The service keeps its client alive.
+
+Boot configuration
+------------------
+
+scripts/install-phone-wifi.py installs and enables these systemd units:
+etherpocket-wifi-prepare, etherpocket-modem, etherpocket-wlfw and
+etherpocket-wifi. Preparation creates the rmtfs UIO alias and firmware
+discovery directory. QRTR and firmware services start before the modem.
+The driver loads and receives ON through /dev/wlan; NetworkManager
+automatically connects when wlan0 becomes available.
+
+scripts/configure-phone-wifi.py reads exactly two lines from wifi.txt:
+SSID and WPA personal password. Credentials go over pinned SSH stdin,
+never shell arguments or logs. The root-owned NetworkManager profile
+etherpocket-wifi.nmconnection has mode 0600, autoconnect=true and
+autoconnect-retries=0. Its PSK is derived locally on the phone. wifi.txt
+is excluded by .gitignore.
+
+Initial hardware verification
+-----------------------------
+
+NetworkManager activated etherpocket-wifi on wlan0, obtained
+10.1.30.146/8 and a default route through 10.1.1.1. Two packets to
+1.1.1.1 returned with zero loss. Boot verification is recorded separately
+in evidence/wifi-startup-2026-10-15.txt.
+
+The first software reboot entered Qualcomm USB crash mode (PID 900E).
+After the user performed a physical restart, automatic Wi-Fi connection
+was verified without issuing any connection command: wlan0 connected,
+received 10.1.30.146, and internet ping again passed with zero loss. The
+user confirmed the Mobian desktop. Boot services completed successfully
+and the one-shot boot menu marker was consumed.
+
+An explicit disconnect/unload step before firmware shutdown has now been
+deployed, and its service ordering passed systemd-analyze verify. A
+further software reboot has not been tested; this change must not be
+described as a verified fix for the software reboot failure.
+
+The diagnostic attempts before installing the required services produced
+modem subsystem restarts. The final setup includes OEM NV mappings,
+firmware path handling and correct QRTR publication to address these
+failures. RELATED subsystem recovery is selected before starting the
+modem so a subsystem failure does not request a full system restart.

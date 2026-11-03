@@ -1,0 +1,17 @@
+[Unit]
+Description=EtherLock session protection coordinator
+After=graphical-session.target
+PartOf=graphical-session.target
+
+[Service]
+Type=dbus
+BusName=com.etherneco.EtherLock1
+ExecStart=/usr/bin/python3 /usr/share/etherlock/service.py
+# Restarting the coordinator must never kill the enforcing locker.
+KillMode=process
+Restart=on-failure
+RestartSec=2
+UMask=0077
+LimitCORE=0
+
+# Deliberately no Install section: deployment and manual acceptance come first.

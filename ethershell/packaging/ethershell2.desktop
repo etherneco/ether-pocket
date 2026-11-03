@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=EtherShell 2
+Comment=Floating touch windows integrated with the current X11 desktop
+Exec=ethershell2-start
+Icon=preferences-desktop
+Terminal=false
+Categories=System;

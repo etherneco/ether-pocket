@@ -1,0 +1,12 @@
+[Desktop Entry]
+Type=Application
+Name=EtherFiles
+GenericName=File Manager
+Comment=Touch-first native file manager for EtherPocket and EtherAir
+Exec=etherfiles %u
+Icon=etherfiles
+Terminal=false
+Categories=System;FileTools;FileManager;
+MimeType=inode/directory;
+StartupNotify=true
+StartupWMClass=etherfiles

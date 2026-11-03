@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=EtherShell
+Comment=Native X11 touch desktop with Openbox
+Exec=ethershell-session
+TryExec=ethershell
+Type=Application
+DesktopNames=EtherShell;

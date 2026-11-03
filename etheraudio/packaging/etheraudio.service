@@ -1,0 +1,21 @@
+[Unit]
+Description=EtherPocket session audio policy (existing PipeWire/Pulse backend)
+After=pipewire-pulse.service wireplumber.service
+
+[Service]
+Type=dbus
+BusName=com.etherneco.EtherAudio1
+ExecStart=/usr/bin/python3 -I /usr/share/etheraudio/service.py
+Restart=on-failure
+RestartSec=3
+UMask=0077
+ConfigurationDirectory=etheraudio
+ConfigurationDirectoryMode=0700
+NoNewPrivileges=yes
+PrivateTmp=yes
+ProtectSystem=strict
+RestrictAddressFamilies=AF_UNIX
+LockPersonality=yes
+
+[Install]
+WantedBy=default.target

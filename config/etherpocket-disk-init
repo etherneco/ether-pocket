@@ -1,0 +1,43 @@
+#!/bin/busybox sh
+# Native disk bootstrap. Android volumes are never mounted here.
+export PATH=/bin:/sbin:/usr/bin:/usr/sbin
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+mount -t devtmpfs devtmpfs /dev
+mkdir -p /run /dev/pts /dev/shm /newroot
+mount -t tmpfs tmpfs /run
+mount -t devpts devpts /dev/pts
+mount -t tmpfs tmpfs /dev/shm
+echo 'EtherPocket Mobian disk bootstrap' > /dev/console
+# Refuse a different phone or any unexpected partition identity.
+if ! grep -q 'androidboot.serialno=548cb338' /proc/cmdline; then
+    echo 'Phone identity mismatch' > /dev/console
+    exec sh
+fi
+for attempt in $(seq 1 30); do
+    [ -b /dev/sda21 ] && break
+    sleep 1
+done
+# Debian's static BusyBox omits blkid. Read the ext4 label field directly;
+# mount verifies the filesystem and the root marker verifies the payload.
+identity=$(dd if=/dev/sda21 bs=1 skip=1144 count=16 2>/dev/null | tr -d '\000')
+case "$identity" in
+    etherpocket) ;;
+    *) echo 'Mobian ext4 identity missing; rescue SSH only' > /dev/console
+       /usr/local/sbin/etherpocket-usb-debug > /run/usb-debug.log 2>&1 &
+       exec /usr/sbin/dropbear -F -E -s -r /etc/dropbear/dropbear_ed25519_host_key ;;
+esac
+if ! mount -t ext4 -o ro /dev/sda21 /newroot; then
+    echo 'Mobian mount failed; rescue shell' > /dev/console
+    exec sh
+fi
+if [ "$(cat /newroot/etc/etherpocket/disk-identity 2>/dev/null)" != 'GM1920-548cb338-mobian-sda21' ]; then
+    umount /newroot
+    echo 'Root identity marker mismatch' > /dev/console
+    exec sh
+fi
+mount --move /dev /newroot/dev
+mount --move /sys /newroot/sys
+mount --move /proc /newroot/proc
+mount --move /run /newroot/run
+exec /bin/busybox switch_root /newroot /sbin/init

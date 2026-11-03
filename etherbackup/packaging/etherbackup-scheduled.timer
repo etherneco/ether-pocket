@@ -1,0 +1,11 @@
+[Unit]
+Description=Daily EtherBackup with missed-run catch-up
+
+[Timer]
+OnCalendar=daily
+Persistent=true
+RandomizedDelaySec=15m
+Unit=etherbackup-scheduled.service
+
+[Install]
+WantedBy=timers.target

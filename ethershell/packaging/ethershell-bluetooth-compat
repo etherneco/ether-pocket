@@ -1,0 +1,7 @@
+#!/bin/sh
+# Compatibility entry point for already-running EtherShell builds that still
+# invoke blueman-manager. Installed only inside their private executable PATH.
+if /usr/bin/wmctrl -x -a etherbluetooth.EtherBluetooth 2>/dev/null; then
+    exit 0
+fi
+exec /usr/bin/etherbluetooth

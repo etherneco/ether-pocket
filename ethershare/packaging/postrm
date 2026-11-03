@@ -1,0 +1,8 @@
+#!/bin/sh
+set -e
+if [ -d /run/systemd/system ]; then
+ if [ "$1" = remove ] || [ "$1" = purge ]; then
+  systemctl disable ethershare.service || true
+ fi
+ systemctl daemon-reload
+fi

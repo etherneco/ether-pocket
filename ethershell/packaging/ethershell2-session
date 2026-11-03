@@ -1,0 +1,11 @@
+#!/bin/sh
+set -eu
+export ETHERSHELL_EXPERIMENTAL=1
+export XDG_CURRENT_DESKTOP=EtherShell2
+export XDG_SESSION_TYPE=x11
+export XDG_CONFIG_HOME="$HOME/.config/ethershell2-session"
+export XDG_CACHE_HOME="$HOME/.cache/ethershell2-session"
+export XDG_DATA_HOME="$HOME/.local/share/ethershell2-session"
+export MOZ_USE_XINPUT2=1
+unset SESSION_MANAGER GDK_CORE_DEVICE_EVENTS QT_XCB_NO_XI2 QT_XCB_NO_TOUCH
+exec dbus-run-session -- python3 /usr/share/ethershell/experimental_session.py

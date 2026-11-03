@@ -1,0 +1,21 @@
+[Unit]
+Description=EtherNotifications central notification service
+After=dbus.service
+
+[Service]
+Type=dbus
+BusName=org.freedesktop.Notifications
+ExecStart=/usr/bin/python3 -I /usr/share/ethernotifications/service.py
+Restart=on-failure
+RestartPreventExitStatus=73
+RestartSec=3
+UMask=0077
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=read-only
+StateDirectory=ethernotifications
+StateDirectoryMode=0700
+
+[Install]
+WantedBy=default.target

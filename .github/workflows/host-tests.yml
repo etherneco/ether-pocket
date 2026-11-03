@@ -1,0 +1,32 @@
+name: Host tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  portable:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: X11 parsing and display policy
+        run: python -m unittest discover -s tests -p test_x11.py
+      - name: Windows control transport
+        run: python -m unittest discover -s etherpocket-control -p test_transport.py
+      - name: Mobile data status and cleanup (POSIX)
+        if: runner.os == 'Linux'
+        env:
+          PYTHONPATH: scripts
+        run: |
+          python -m unittest discover -s tests -p test_mobile_data_status.py
+          python -m unittest discover -s tests -p test_ethermobile_data_cleanup.py

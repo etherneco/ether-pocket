@@ -1,0 +1,21 @@
+[Unit]
+Description=EtherPocket policy-controlled scheduled backup
+After=etherpower.service network.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/etherbackup scheduled
+StateDirectory=etherbackup
+StateDirectoryMode=0700
+UMask=0077
+Nice=15
+IOSchedulingClass=idle
+MemoryMax=768M
+TasksMax=64
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+TimeoutStartSec=3h

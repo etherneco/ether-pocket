@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=EtherShell
+Comment=Start EtherShell after logging into XFCE
+Exec=/usr/bin/ethershell
+TryExec=/usr/bin/ethershell
+Icon=preferences-desktop
+Terminal=false
+OnlyShowIn=XFCE;
+Hidden=false

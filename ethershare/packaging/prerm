@@ -1,0 +1,5 @@
+#!/bin/sh
+set -e
+if [ -d /run/systemd/system ]; then
+ systemctl stop ethershare.service
+fi

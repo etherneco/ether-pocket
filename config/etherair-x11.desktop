@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=EtherAIR X11 display watcher
+Comment=Configure discovered displays after hotplug and resume
+Exec=etherair-x11 watch
+OnlyShowIn=XFCE;OPENBOX;
+Terminal=false

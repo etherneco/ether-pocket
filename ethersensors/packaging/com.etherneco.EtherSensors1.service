@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.etherneco.EtherSensors1
+Exec=/usr/bin/python3 /usr/share/ethersensors/service.py
+SystemdService=ethersensors.service

@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+if [ "$1" = remove ] && [ -d /run/systemd/system ]; then
+ # Restore only the baseline controls owned by this manager, never restart peers.
+ if /usr/bin/python3 -c 'import json,subprocess,sys;d=json.loads(subprocess.check_output(["etherpower","state"]));sys.exit(0 if d.get("config",{}).get("requestedProfile") else 1)'; then
+  etherpower restore || true
+ fi
+ systemctl stop etherpower.service
+ systemctl disable etherpower.service
+fi

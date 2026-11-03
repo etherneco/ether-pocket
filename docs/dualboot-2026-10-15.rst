@@ -1,0 +1,154 @@
+GM1920 Android / Mobian dual boot — 2026-10-15
+============================================
+
+Later boot-menu update
+----------------------
+
+Both boot slots now contain the Etherneco menu. Volume Up/Down selects
+etherPocket or Android 10; Power confirms. The menu switches slots on the
+phone, with a one-shot marker preventing a second menu during the handoff.
+The following image hashes and PC-only selection description document the
+earlier installation. Current image identities are in
+build/dualboot-installed.json and /etc/etherpocket/boot-images.json on
+Mobian. See docs/bootmenu-2026-10-15.rst for the menu implementation,
+verified paths and recovery procedure. Firmware image contents and
+partition geometry were not changed by the menu installation.
+
+Storage and authorization
+-------------------------
+
+The user requested 32 GB Android and the remaining storage for Mobian,
+then explicitly authorized an Android data reset after the 32 GiB
+userdata interpretation was explained. The user performed the stock
+Recovery wipe. Android subsequently completed its first boot and USB ADB
+was re-enabled.
+
+* Android userdata sda20: exactly 34,359,738,368 bytes / 32 GiB.
+  Android reports approximately 31 GiB after filesystem overhead.
+  Fixed Android system/vendor/firmware partitions remain additional.
+* Mobian sda21: 208,467,374,080 bytes / approximately 194.15 GiB.
+  Label etherpocket; ext4 UUID e96c95a2-a935-47b0-94f1-78c7b412eed4.
+* Sector size: 4096 bytes. userdata starts at LBA 2,125,192 and ends
+  at 10,513,799. Mobian starts at 10,513,920 and ends at 61,409,274.
+* Alignment gap: 491,520 bytes. Other partition geometry and unique
+  partition GUIDs remain unchanged.
+
+Primary/backup GPT CRCs for all six UFS LUNs were verified before the
+change. The saved first/last 128 KiB windows are in the ignored private
+recovery/dualboot-audit directory. Only GPT header/entry-array sectors
+were written, never the other contents of those backup windows. GPT
+backups are not personal-data backups. The original boot/dtbo/vbmeta A/B
+images are also retained with verified SHA256 manifests.
+
+Installed systems
+-----------------
+
+Mobian is native Debian ARM64 with Mobian packages, systemd, Xorg and
+XFCE. Root is physically mounted from /dev/sda21, writable, with an
+identity marker checked by the disk initramfs. Android is not used as a
+container host. Wayland is not the active display server.
+
+The tested kernel is 4.14.117-perf #5. Kernel patch 0006 prevents the DSI
+backlight code from casting a DP connector to a DSI display. The prior
+Oops terminated a commit worker and could block device_shutdown. The
+patch is present in the booted kernel; glasses hotplug/output still needs
+an actual retest with a suitable USB-C adapter.
+
+Mobian boot_a image: build/native-disk-dp-fixed.img, 45,527,040 bytes,
+SHA256 2ea1c9f1de7a15b78ad29bb650a7819f00476456306bcd899733eb76a8fbb15c.
+The image first passed a temporary Fastboot disk-root boot before flashing.
+The original Android boot_b remains SHA256
+12f5ceb09558339c5d395078f7b0675374b4fd2b7c6d6900d2939badec11440d.
+
+The OEM A slot had only 21 DTBO entries; the working B slot had 38,
+including the board overlay index 35 used by this GM1920. Mobian's
+DTBO A was replaced with the verified stock DTBO B image. Both now hash
+6c319d579555e5f09de443db832c1659a0ee0763c59f64ebbca2ed11a3f921ef.
+
+The initial A boot also failed authentication. Mobian's vbmeta_a now
+uses the stock B metadata with flags 3 (verification/verity disabled for
+the custom A-slot image), SHA256
+27baa59973666d15bda4f690a4b55231f290b50097e609c8c3d9fbaa3c3f6368.
+Android vbmeta_b remains the original signed image, SHA256
+d06d5a24fa9091f9e38dbf000037ef94412097babffbed33d466f97274250a0e.
+No XBL, ABL, TZ or other firmware image was flashed.
+
+Display and input
+-----------------
+
+XDG session type x11, physical 1440x3120 panel, touch and visible desktop
+updates were verified. The three Xorg modesetting patches are required.
+Patch 0003 was extended after a cold-boot failure: it skips inactive
+CRTCs and retains shadow-damage tracking even when DIRTYFB is unsupported.
+Otherwise the first inactive CRTC could permanently disable refresh and
+make working touch appear broken.
+
+The final modesetting module SHA256 is
+e127c81a1b2371acd107115e79e459680ff0eed03a807fd41f67d64f139f71a9.
+The libinput quirk removes invalid width axes from the vendor touchpanel.
+Panel initialization sets bl_power=0 and brightness=300. Onboard starts
+in the XFCE session and was visible in the captured scanout.
+
+Mesa reports llvmpipe and Accelerated: no. Hardware GPU acceleration is
+not claimed. Nreal has not displayed a verified desktop in this setup.
+
+Selecting a system
+------------------
+
+Use Android.cmd or Mobian.cmd with the USB cable connected to this PC.
+They call scripts/Switch-EtherPocket.ps1 and switch-etherpocket.py.
+This is persistent dual boot selected with PC assistance, not an on-phone
+boot menu. A normal power-on starts the last selected system.
+
+Important device-specific behavior: the inactive OEM boot partition uses
+the generic type GUID 77036cd4-03d5-42bb-8ed1-37e5a88baa34, while the
+selected boot image uses 20117f86-e985-4357-b9ee-374bc1d8487d. On this
+phone, Fastboot set_active changes slot flags without correcting those
+boot type GUIDs. Flags alone were insufficient for reliable switching.
+
+The final selector prepares canonical boot type GUIDs and boot flags
+from native Mobian, verifies both GPT copies, reboots to Fastboot, then
+completes global slot activation and reboots. From Android it first uses
+a temporary native disk-root bridge; switching performs no image flash
+or filesystem formatting. The native helper validates serial, GPT CRCs,
+partition identities and the installed boot image hashes. Firmware image
+contents are never copied or changed by the switcher.
+
+A failed intermediate experiment was rolled back by restoring original
+slot-B GPT types/flags while preserving partition geometry and image
+contents. Android B subsequently completed boot. Do not restore whole
+old GPT backup windows: they describe the old userdata extent.
+
+Debian qbootctl 0.2.2-1 marks native slot A successful, avoiding retry
+exhaustion. Its service and both slots' bootable status were checked.
+Android OTA updates can replace the inactive slot; OTA-safe coexistence
+has not been implemented.
+
+Validation
+----------
+
+Normal disk-root boot from A, active LightDM/XFCE, working physical touch
+and screen updates were confirmed. The corrected selector completed
+Mobian -> Android, with sys.boot_completed=1, slot _b and the 32 GiB
+userdata volume. The final Android -> Mobian return also completed through
+the same selector. Slot A was bootable/successful, LightDM active and root
+writable on sda21. The persistent marker retained SHA256
+320c98f50156379993804acfcfc9beee7d263d755c9c615e0a79a4d11273a41c.
+
+Host EtherAIR tests: 16 passing. Evidence includes
+
+evidence/dualboot-disk-first-boot.txt,
+evidence/dualboot-disk-x11.txt,
+evidence/dualboot-slot-a-first-boot.txt,
+evidence/dualboot-persistence-before.txt,
+evidence/dualboot-switch-android.txt and
+evidence/dualboot-switch-mobian.txt. The phone was left running Mobian.
+
+Primary references
+------------------
+
+* https://source.android.com/docs/security/features/encryption/metadata
+* https://source.android.com/docs/core/ota/ab
+* https://sources.debian.org/src/qbootctl/0.2.2-1/bootctrl_impl.c
+* https://github.com/linux-msm/qbootctl
+* https://android.googlesource.com/platform/system/core/+/b6ea435a2048a1e6abe76bd47380da6911d8b28c

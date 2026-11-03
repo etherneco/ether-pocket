@@ -1,0 +1,16 @@
+#!/bin/sh
+set -e
+if [ "$1" = configure ]; then
+ getent group etherhardware >/dev/null || addgroup --system etherhardware
+ getent passwd etherhardware >/dev/null || adduser --system --ingroup etherhardware --no-create-home --home /nonexistent etherhardware
+ for group in video audio input render; do
+  getent group "$group" >/dev/null && adduser etherhardware "$group" >/dev/null
+ done
+ systemctl daemon-reload
+ if [ -d /run/systemd/system ]; then
+  # Resolve the newly created service account before acquiring the bus name.
+  busctl call org.freedesktop.DBus /org/freedesktop/DBus org.freedesktop.DBus ReloadConfig
+  systemctl enable etherhardware.service
+  systemctl restart etherhardware.service
+ fi
+fi

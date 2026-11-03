@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.etherneco.EtherAudio1
+Exec=/usr/bin/python3 -I /usr/share/etheraudio/service.py
+SystemdService=etheraudio.service

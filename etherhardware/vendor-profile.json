@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "deviceTreeModel": "SDX50M MTP 18827 15",
+  "kernel": "4.14.117-perf",
+  "source": "Existing EtherMobile vendor audit, 2026-10-18; metadata only",
+  "firmware": {
+    "ipa_fws.mdt": {
+      "bytes": 7020,
+      "sha256": "aed70e105df5bf60cf5026a39678d730bb5b280137fe8baa4f3d6a81e3ba034c"
+    },
+    "ipa_fws.b00": {
+      "bytes": 212,
+      "sha256": "f8e8e7ad72fca66e001419a9f31a11e70acf7c5543c33564fc7ab398c9dd724d"
+    },
+    "ipa_fws.b01": {
+      "bytes": 6808,
+      "sha256": "5d2ffe5e6e0420281da427095379816d64d0e023a2087b212f29283b47b37ff1"
+    },
+    "ipa_fws.b02": {
+      "bytes": 22096,
+      "sha256": "2e181083e6c54c2387090ea3ad0dd758e1f97f839a08bc550927693d933f016d"
+    },
+    "ipa_fws.b03": {
+      "bytes": 128,
+      "sha256": "14024088f436ebd24b097cb113b2177e12c939efdac0211d560c7cc498611507"
+    },
+    "ipa_fws.b04": {
+      "bytes": 320,
+      "sha256": "8d572c4b4dee9572d90ab90137ec030331856bbfd8bf2e6ee315da4a5bab3373"
+    },
+    "ipa_uc.mdt": {
+      "bytes": 6860,
+      "sha256": "9a9a2f7eb7c9e06d4e2b42a236b7680b2c29485a82414c51e243afa31914c26c"
+    },
+    "ipa_uc.b00": {
+      "bytes": 148,
+      "sha256": "6d41128538f7a82869419ba2234ffd2e8d40f975e29bd04b0ca768673c759a9e"
+    },
+    "ipa_uc.b01": {
+      "bytes": 6712,
+      "sha256": "e12e172f7b903a6b36099d9e6fbefd58099d48385dc614eafcf419bb1ef9e194"
+    },
+    "ipa_uc.b02": {
+      "bytes": 37888,
+      "sha256": "3e9a083d928106c2e108db8d445e8c1bef0d03deadadb8d2be73d66db6f27d8d"
+    }
+  }
+}

@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.etherneco.EtherLocation1
+Exec=/usr/bin/python3 /usr/share/etherlocation/service.py
+SystemdService=etherlocation.service

@@ -1,0 +1,183 @@
+# TASK UPDATE — EtherPocket: X11-Only Graphics Architecture
+
+**Priority:** Critical  
+**Target:** OnePlus 7 Pro / Snapdragon 855 / ARM64  
+**Operating system:** Native Mobian / Debian ARM64  
+**Display server:** Xorg (X11)  
+**Desktop:** XFCE4  
+**Wayland:** Not permitted as the active display server
+
+## 1. Mandatory architecture change
+
+Replace the previously proposed Wayland/Phosh desktop stack with an X11-based environment.
+
+The required architecture is:
+
+```text
+OnePlus 7 Pro
+    |
+Linux ARM64 Kernel
+    |
+Qualcomm DRM/KMS + GPU drivers
+    |
+Mesa / Freedreno
+    |
+Xorg (X11)
+    |
+XFCE4 / Openbox
+    |
+EtherAIR
+    |
+USB-C DisplayPort Alt Mode
+    |
+Nreal Air Glasses
+```
+
+The objective remains a genuine native Linux system, not Android, Termux, proot, or a container.
+
+Mobian is still the preferred Debian-based foundation, but its standard mobile desktop configuration must not dictate the graphics architecture.
+
+If Mobian packaging makes X11 integration impractical, build a Debian ARM64 environment using compatible Mobian packages and document the deviation. Do not silently substitute another operating system.
+
+## 2. Required graphical components
+
+Install and configure:
+
+- `xserver-xorg-core`
+- `xinit`
+- `xauth`
+- `x11-xserver-utils`
+- `xinput`
+- `xrandr`
+- `xserver-xorg-input-libinput`
+- `xfce4`
+- `xfce4-terminal`
+- `openbox`
+- `lightdm`
+- `mesa-utils`
+
+Select an Xorg driver supported by the actual kernel DRM/KMS implementation. Prefer the Xorg modesetting driver where compatible.
+
+Do not assume that installing these packages alone will make the GPU or display work.
+
+Configure the system to start an X11 session by default.
+
+## 3. GPU acceleration
+
+Investigate and enable:
+
+- Qualcomm Adreno 640 support.
+- Mesa Freedreno.
+- DRM/KMS.
+- EGL and OpenGL ES.
+- DRI3 where supported.
+- Hardware-accelerated Xorg rendering.
+
+Verify using:
+
+```bash
+echo "$XDG_SESSION_TYPE"
+glxinfo -B
+xrandr --query
+xinput list
+```
+
+Expected session type:
+
+```text
+x11
+```
+
+Software rendering may be used temporarily for debugging, but must be reported as a limitation.
+
+## 4. Nreal Air external display
+
+Implement and test external display support through native Linux USB-C DisplayPort Alt Mode.
+
+When the kernel exposes a functional DRM connector, use XRandR to detect and configure the glasses.
+
+Target display mode:
+
+- 1920×1080 where advertised by EDID.
+- Extended desktop support.
+- Mirror mode support.
+- Hotplug detection.
+- Automatic display configuration.
+
+Do not assume the output will be named `DP-1`; discover its actual name.
+
+Do not claim Nreal Air compatibility until the glasses display a real X11 desktop.
+
+## 5. EtherAIR integration
+
+EtherAIR must operate as a native X11 application or X11-compatible desktop layer.
+
+Investigate:
+
+- XRandR for display management.
+- XInput2 for input handling.
+- XComposite for window composition.
+- XDamage for window updates.
+- XFixes for cursor and region handling.
+- XTest for authorized synthetic input.
+- X11 window properties and EWMH for window management.
+- OpenGL/EGL for rendering.
+
+Support multiple virtual workspaces, external displays and future AR window positioning.
+
+Do not implement the core EtherAIR interface using Wayland protocols.
+
+## 6. Mobile-specific requirements
+
+Because X11 is being used on a smartphone, provide:
+
+- Touchscreen calibration.
+- Portrait and landscape rotation.
+- DPI and UI scaling.
+- On-screen keyboard compatible with X11.
+- Touch-friendly launcher.
+- Battery and thermal monitoring.
+- Suspend/resume handling where supported.
+
+XFCE4 is the initial desktop environment, not necessarily the final EtherAIR interface.
+
+## 7. Implementation requirements
+
+Update all previous task sections that reference:
+
+- Phosh.
+- Wayland.
+- Wayland compositors.
+- Wayland-only libraries.
+- Wayland-specific display management.
+
+Replace them with the X11 architecture described above.
+
+Preserve all previous requirements concerning:
+
+- Hardware discovery.
+- Bootloader and partition safety.
+- Native Linux kernel.
+- Mobian root filesystem.
+- Reproducible builds.
+- Recovery.
+- USB debugging.
+- Nreal Air.
+- EtherPocket integration.
+
+## 8. Acceptance criteria
+
+The implementation is successful when:
+
+1. OnePlus 7 Pro boots native Linux.
+2. The Xorg server starts on the physical device.
+3. `XDG_SESSION_TYPE=x11` is confirmed.
+4. XFCE4 or Openbox is displayed on the phone.
+5. Touchscreen input works.
+6. GPU acceleration is verified or its blocker documented.
+7. Nreal Air is detected and displays the X11 desktop, if native DP support can be implemented.
+8. EtherAIR can interact with the X11 environment.
+
+**Important:** Do not implement Wayland as a fallback without explicit user authorization. If X11 cannot run because of missing kernel, GPU or display support, report the precise blocker and work on that subsystem.
+
+Continue with the physical device already connected over USB. Do not perform destructive flashing without explicit approval.

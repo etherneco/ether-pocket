@@ -1,0 +1,13 @@
+{
+  "schemaVersion": 1,
+  "name": "EtherHardware",
+  "slug": "etherhardware",
+  "platform": "linux",
+  "architecture": "arm64",
+  "format": "deb",
+  "version": "0.1.1",
+  "package": "etherhardware_0.1.1_arm64.deb",
+  "service": "com.etherneco.EtherHardware1",
+  "settingsRoute": "hardware",
+  "publication": "Local package; remote publication requires distributor release credentials"
+}

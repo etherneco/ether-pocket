@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.etherneco.EtherPhone1
+Exec=/usr/bin/python3 /usr/share/etherphone/service.py
+SystemdService=etherphone.service

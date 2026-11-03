@@ -1,0 +1,145 @@
+EtherPocket boot menu — 2026-10-15
+================================
+
+Verified on the GM1920
+---------------------
+
+The supplied Etherneco logo and the etherPocket / Android 10 menu render
+on the physical 1440x3120 panel using native DRM atomic modesetting.
+The user confirmed the visible menu. The initramfs test subsequently
+logged a physical volume-key selection of Android 10. The ARM64 input
+state self-test passes, including ignoring the power key held at startup.
+
+The menu waits for Volume Up/Down and confirms on release of Power.
+There is no automatic selection timeout in the boot image. The separate
+desktop preview has a 120-second timeout and restores LightDM.
+
+Build and handoff tests
+-----------------------
+
+``scripts/build-bootmenu-image.sh`` builds ``build/native-bootmenu-test.img``
+from the guarded disk bootstrap, the supplied screens, libdrm and a
+device-specific slot selector. It is installed on boot_a and its prefix
+hash was verified from the physical partition after a normal boot.
+
+The candidate mounts Mobian read-only and displays the menu before
+starting systemd or Xorg. Selecting etherPocket continues the existing
+switch_root path. Selecting Android now switches slots and reboots.
+USB belongs to the selected OS in normal builds. Rescue Dropbear is
+explicitly enabled only by /etc/etherpocket/bootmenu-debug on Mobian;
+its pinned host key is in build/mini-known-hosts.
+
+Kernel #6 with CONFIG_KEXEC successfully booted the disk-root system.
+The original Android payload loaded successfully (kexec_loaded=1), but
+executing it from the full Linux system produced a black screen and no
+ADB. The user recovered Mobian with a hardware restart. A second test
+from the early initramfs menu also lost SSH without bringing up ADB;
+the user confirmed a black screen and recovered by hardware restart.
+
+Stock-kernel Android handoff
+----------------------------
+
+The stock Android kernel also displayed the menu and provided rescue SSH.
+``build-stock-menu-test.sh`` retains its module ABI and changes the unique
+``skip_initramfs`` parameter name to allow this menu's initramfs to run.
+It creates a read-only dm-verity mapping using the saved verified system_b
+table and attempts to switch_root into Android's original /init.
+
+The initial Android-init log identified fatal EBUSY failures mounting
+/proc and /sys. Android FirstStageMain expects to create these mounts;
+moving the menu's existing mounts into its root caused the failures.
+The normal handoff now detaches the menu mounts instead. A diagnostic
+boot then reached Android's visible UI, but retaining the rescue RNDIS
+gadget prevented normal ADB. The normal build now leaves USB completely
+to Android, unless a root-owned bootmenu-debug file explicitly enables
+rescue RNDIS. This build completed an Android 10 boot with ADB and slot B
+verified; see evidence/bootmenu-android-normal-boot.txt.
+
+CURRENT DEVICE STATE: boot_b contains the stock-kernel menu with the
+validated Android handoff and normal USB. The original Android boot_b is
+backed up at recovery/stock-backup/boot_b.img. boot_a contains the native
+menu with kernel #6. Both image prefixes were read back and verified.
+
+The first qbootctl-based standalone slot switch also failed. The previous
+GPT type identities and flags were restored from the fresh pre-test
+backup using only GPT entry/header sectors, and all six GPT CRC pairs
+were verified. Boot LUN A was restored using the vendor UFS ioctl. The
+known host-assisted switch then booted Android successfully again.
+Reading the UFS attribute on its verified B path confirmed boot LUN 2.
+
+The revised selector preserves non-boot firmware type GUID identities,
+canonicalizes only boot_a/boot_b, and uses the vendor UFS ioctl instead of
+the missing upstream UFS BSG interface. This revision completed physical
+button-driven switches in both directions. Shared one-shot markers on
+the verified Mobian filesystem avoid showing the menu twice during a
+cross-slot switch. The user confirmed Android and Mobian after selection.
+
+Validation and installed images
+--------------------------------
+
+* Normal Android boot: ADB sys.boot_completed=1, slot _b, Android 10.
+* Android-menu -> etherPocket: native writable /dev/sda21, slot _a,
+  active LightDM, successful/bootable A and bootable B.
+* Installed native menu -> etherPocket: kernel #6 and active LightDM;
+  the user confirmed the visible Mobian desktop.
+* Installed native menu -> Android: user confirmed Android; ADB verified
+  slot _b and Android 10 after the switch without another selection.
+* All six UFS GPT primary/backup CRCs passed. Partition geometry and unique
+  GUIDs remained unchanged. Type GUID changes were confined to boot_a
+  and boot_b. Firmware image contents were not written.
+* The persistent native test marker retained SHA256
+  320c98f50156379993804acfcfc9beee7d263d755c9c615e0a79a4d11273a41c.
+* ARM64 key-state self-tests and shell/Python syntax checks passed.
+
+boot_a: build/native-bootmenu-test.img, 46,329,856 bytes, SHA256
+7d4027e03699b4208da881f956c2d8b26dd89d0df43c5846183c6e63179a86d5.
+
+boot_b: build/stock-menu-test.img, 46,637,056 bytes, SHA256
+2ca1e256ac4efd92d27745191d2d81b88eb1f4946e14fec4045e8e52b257e036.
+
+The filenames retain their original test names; these hashes identify the
+installed, verified versions. Current identities are also recorded in
+build/dualboot-installed.json and /etc/etherpocket/boot-images.json.
+
+Evidence includes bootmenu-android-normal-boot.txt,
+bootmenu-android-to-mobian.txt, bootmenu-native-installed.txt and
+bootmenu-mobian-to-android.txt. Redundant-table audits are retained under
+recovery/bootmenu-*; use only GPT header/entry updates when recovering,
+never overwrite whole backup windows across partition-layout changes.
+
+Rebuilding and recovery
+-----------------------
+
+With the prepared EtherPocketBuild WSL kernel, miniroot and qbootctl source
+trees, regenerate assets using host Python and then run::
+
+    python scripts/build-bootmenu-assets.py
+    wsl -d EtherPocketBuild -- bash /mnt/c/projects.local/mobiam/scripts/build-bootloaders.sh
+
+scripts/verify-bootmenu-installation.py verifies installed image prefixes,
+persistent data, native services and the optional PC selector from Mobian.
+Android.cmd / Mobian.cmd remain available for PC-assisted recovery, using
+the original verified native disk-root bridge and the current installed
+image identities. Both menu images can be replaced from Fastboot using
+the saved originals; restoring only boot_b preserves the on-disk Android
+data volume. Revalidate slot types and activation after any restoration.
+
+Android OTA-safe coexistence remains outside this installation: an OTA
+can replace a boot slot and its menu. The saved verity table also belongs
+to this exact installed Android system image.
+
+Header-logo update
+------------------
+
+The logo now comes from the user-selected transparent PNG at
+https://www.etherneco.com/assets/img/etherneco-logo-header.png.
+It is rendered at its native 520x271 pixels, with its original proportions
+and alpha composited onto black. It is centered in the existing logo area.
+The previous forced 1052x528 resize and alpha-discarding RGB conversion
+were removed. No kernel, DTB or boot-logic payload changed; the two XRGB
+menu screens are the only changed ramdisk files in either image.
+
+The previously verified menu images and identities are retained in
+recovery/bootmenu-before-header-logo. Payload comparison evidence is in
+evidence/bootmenu-header-logo-payload-check.json; installed-prefix readback
+is recorded in evidence/bootmenu-header-logo-installed.txt.

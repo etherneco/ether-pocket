@@ -1,0 +1,126 @@
+EtherShell Settings 2.0 — implementation and acceptance
+=====================================================
+
+Scope
+-----
+
+This changes the existing EtherShell Settings surface, in both Experience and
+legacy Main presentations. It does not introduce a second Settings application.
+The pre-change inventory is in ``settings-2-audit-2026-10-18.rst``; source snapshots
+are in ``evidence/settings2-source-baseline``. The installed shell package is
+version 2.1.0; the user-facing redesign is Settings 2.0.
+
+All eleven categories share the same lazy-loaded workspace: Network & Internet,
+Connected Devices, Display & Appearance, Sound & Notifications, Battery & Power,
+Storage, Security & Privacy, Applications, Keyboard & Input, System and Etherneco.
+Wi-Fi, Bluetooth and the existing nine-section cellular manager are integrated.
+Search indexes individual settings and scrolls to their actual controls.
+
+Design and interaction
+----------------------
+
+``ethershell/qml/settings`` centralizes semantic light/dark colours, typography,
+spacing, touch targets, cards, rows, switches, actions, fields, tabs, selections,
+dialogs, bottom sheets and status states. Existing accent, font scale and contrast
+preferences remain effective. The phone uses its short screen dimension to size
+the logical canvas; wider external layouts use two category columns. Settings
+chrome is compact and the dock stays outside the content area.
+
+Selection lists use touch sheets rather than large desktop drop-downs. Popups
+account for the transformed canvas, including landscape and narrow screens.
+EtherKeyboard uses its compact nonterminal layout in Settings; focus and viewport
+changes scroll editable fields into view. APN input and Save/Cancel visibility
+are explicitly checked with the keyboard open. The terminal keyboard retains its
+existing commands and arrows. Destructive profile operations retain confirmation.
+
+The reference screenshot supplies visual direction only. Operator, registration,
+signal, roaming, addresses and traffic come from the real device. No sample
+Orange connection, invented IP addresses or simulated internet state are used.
+
+Backends and persistence
+------------------------
+
+The existing Core, Pocket, Media, Bluetooth instance and shared EtherMobile
+NM/MM backend remain the sources of truth. No competing network, modem or
+Bluetooth manager, privileged daemon, firmware change or new policy is installed.
+Opening a page does not initiate radio discovery or network scans. System
+inspection uses asynchronous queries; explicit scans remain user actions.
+
+Wi-Fi exposes actual radio, saved profiles, connection actions and effective
+IP/DNS/gateway. Bluetooth exposes the existing pairing/connection/trust workflow.
+Audio exposes actual sinks/sources and verifies default-route writes. Display,
+wallpaper, shell navigation, keyboard, notifications and power preferences retain
+their existing callbacks. Storage uses the real home filesystem and block-device
+inventory. Applications use the installed desktop entries, validated default
+browser selection, startup inventory and existing package/update tools. System
+shows actual device, Debian, CPU, memory, date and running services.
+
+Core preference writes now use atomic QSaveFile commits and JSON readback; failed
+writes restore the prior in-memory preference. Wi-Fi radio and audio/default
+browser changes are read back before reporting success. Cellular APN editing,
+credential preservation, profile version guards, rollback, SIM controls, modes,
+usage and Doctor retain their existing implementation. Earlier real NM profile
+and approved reboot persistence evidence remains in the mobile-network report.
+
+Capability limits
+-----------------
+
+Features without an established verified provider are labelled unavailable or
+route explicitly to the existing advanced system editor. These include native
+hotspot/VPN/proxy configuration, certificate and application permission editors,
+per-application energy accounting, power profiles and remaining-time estimates,
+physical input tuning, raw log/admin and backup workflows. Missing Etherneco
+applications are identified as missing. These are not presented as working
+switches. Bluetooth notification preferences and visual low-power effects are
+labelled according to their actual scope.
+
+Validation and deployment evidence
+----------------------------------
+
+``scripts/deploy-settings2.py`` builds on side-by-side stages under
+``/opt/ethershell2``. Before activation it runs the real ARM64 executable as
+mobian, using authenticated private X servers and isolated user preferences,
+against the real system D-Bus. Eight suites cover Settings and Mobile at
+360x900, 1080x2340, 1000x600 and 1920x1080. Every category and cellular section is
+rendered in both themes. Tests also cover direct search navigation, horizontal
+geometry, keyboard focus, preference readback, APN draft preservation and
+keyboard-obscured controls. QML warnings fail acceptance.
+
+Final ARM64 run: all eight suites passed, 484/484 checks (88 Settings and
+33 Mobile checks at each of the four sizes), with no QML warnings. Screenshots
+were visually reviewed, including the 360-wide APN editor and landscape theme.
+
+Results and screenshots: ``evidence/settings2-device``; exact staged package,
+binary and acceptance hashes: ``evidence/settings2-stage.json``. Activation uses
+those exact hashes, preserves the prior launcher and stage, and rolls back if
+the new process fails startup. Only the user shell is restarted. The deployment
+record is ``evidence/settings2-deployment.json``.
+
+``scripts/verify-settings2-device.py`` checks the actual running stage, UID 1000,
+soft blanking, Wi-Fi, Bluetooth, XFWM and existing modem/network/SSH services.
+It navigates the active shell, captures the physical X11 screen and exercises
+scrolling through a temporary synthetic XI2 touchscreen, which is destroyed on
+exit. Results are in ``evidence/settings2-regression.json`` and screenshots in
+``evidence/settings2-live-*.png``. This is input-path validation, not a claim of
+human finger testing. The external-size suite validates rendering, not physical
+EtherAIR/glasses transmission. Legacy embedding shares the compiled components;
+the active production presentation tested here is Experience.
+
+The active stage is ``/opt/ethershell2/2.1.0-settings-0fbbd95eb98f``. Its binary
+SHA-256 is ``3473f343fe554c44a2d4368fe62baae4f58cc8f1fb92fc71e922999b97095e7d``.
+The previous 2.0.2 stage and
+``/home/mobian/.local/bin/ethershell2-start.before-settings2`` remain available.
+Live screenshots were reviewed at the physical panel's 1440x3120 resolution.
+The active window occupies 1440x2720; status chrome and dock are outside it.
+Touch scrolling increased the workspace's content offset from 0 to 342 without
+changing category. A synthetic touch on the real editable field opened
+EtherKeyboard; the captured screen confirms the field remains fully visible
+above it. The test then hid the keyboard and returned to Settings home.
+All five monitored services remained active; Wi-Fi stayed
+connected, Bluetooth powered and XFWM running. The live cellular page reports
+O2 UK searching, SIM ready and internet unverified.
+
+Cellular registration and internet remain subject to the real SIM/network state.
+The UI redesign does not imply successful cellular registration or data transfer.
+No SIM PIN/PUK, cellular data activation, network-mode changes, additional IPA
+startup, firmware writes or phone reboot are part of this acceptance run.

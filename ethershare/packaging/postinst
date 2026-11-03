@@ -1,0 +1,10 @@
+#!/bin/sh
+set -e
+if [ "$1" = configure ]; then
+ systemd-tmpfiles --create ethershare.conf
+ if [ -d /run/systemd/system ]; then
+  systemctl daemon-reload
+  systemctl enable ethershare.service
+  systemctl restart ethershare.service
+ fi
+fi

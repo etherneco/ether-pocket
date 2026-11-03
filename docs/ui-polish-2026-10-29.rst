@@ -1,0 +1,63 @@
+Touch interface polish, 2026-10-29
+================================
+
+Scope
+-----
+
+This is the first appearance pass for EtherShell 2, shared Settings pages,
+EtherFiles, EtherSMS and EtherMAP. It does not claim a completed redesign of
+every installed application.
+
+EtherShell's home and catalogue ScrollViews now explicitly follow the available
+viewport width. Home actions use equal columns, the primary browse action has
+a maximum width, and wide home views have a readable content width. TouchAction
+measures the natural text width separately from the constrained label. Its
+minimum height is 48 logical pixels, with extra height for larger fonts.
+
+Shared Settings controls use a 48-pixel target and show pressed/focus states.
+Rows wrap long hardware identifiers without forcing the layout wider than the
+screen. Category and network rows use distinct SVG pictograms. Camera, gallery,
+location, phone and shell icons resolve to bundled pictograms when the desktop
+theme lacks suitable icons. Camera Media and Camera Capture have separate
+desktop icon identifiers.
+
+Files has larger navigation, entry fields, item menus and action targets;
+category labels measure their text before sizing, and the narrow bottom bar
+uses compact padding. SMS has larger actions and conversation search. Maps has
+larger search, zoom and toolbar targets, text-aware toolbar widths and a header
+background that follows the toolbar height.
+
+Verification and recovery
+-------------------------
+
+``scripts/polish-shell-ui.py`` stages a versioned executable beside the current
+shell and runs the existing isolated Settings acceptance suite at 360x900,
+1440x3120 and 1000x600. It also checks the home viewport and horizontal bounds.
+Long application names may intentionally use a two-line ellipsis. The production
+session stays running during these tests. Activation verifies the tested binary,
+checks that calls/capture are inactive and preserves the previous launcher.
+It restarts the prior shell on activation failure.
+
+``scripts/polish-apps-ui.py`` renders Files, SMS and Maps with private profiles
+on the handset. The Maps test supplies only an isolated unlocked lock response;
+it does not inject positions. ``scripts/activate-apps-ui-polish.py`` backs up
+the installed executables and atomically replaces them with the checked builds.
+Already running applications use their previous executable until reopened.
+
+``scripts/capture-ui-polish.py`` uses the EtherPocket Control capture/input
+agent to inspect the actual display. Its screenshots are separate from the
+isolated renders.
+
+Evidence, checksums and device rollback paths are recorded under
+``evidence/ui-polish``. The original app executables are in
+``/var/backups/etherpocket-ui/a8be23e1e828`` on the phone. Local source originals
+are preserved in ``build/ui-polish-source-before.zip``. Shell deployment records
+identify the previous version and backed-up launcher. App changes are executable
+replacements; an eventual package rebuild should include these source changes.
+
+Final acceptance passed 366 checks in each of the three shell layouts against
+the activated executable. All three standalone application render checks passed.
+The real Settings, Home and Applications screens were subsequently inspected
+through the EtherPocket Control agent. NetworkManager, SSH, Bluetooth, the modem
+helper and ModemManager remained active. See ``summary.json``, ``deployment.json``
+and ``live-*.png`` in the evidence directory.

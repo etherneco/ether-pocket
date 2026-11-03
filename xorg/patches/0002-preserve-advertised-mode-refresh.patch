@@ -1,0 +1,44 @@
+--- a/hw/xfree86/drivers/modesetting/drmmode_display.c
++++ b/hw/xfree86/drivers/modesetting/drmmode_display.c
+@@ -1432,6 +1432,41 @@
+     if (mode->name)
+         strncpy(kmode->name, mode->name, DRM_DISPLAY_MODE_LEN);
+     kmode->name[DRM_DISPLAY_MODE_LEN - 1] = 0;
++
++    /* Qualcomm DSC modes require their advertised nominal refresh.
++     * Timing-derived refresh differs because of command-mode blanking.
++     * Preserve it only for an exact advertised name/timing match. */
++    xf86CrtcConfigPtr config = XF86_CRTC_CONFIG_PTR(scrn);
++    for (int o = 0; o < config->num_output; o++) {
++        drmmode_output_private_ptr priv = config->output[o]->driver_private;
++        if (!priv || !priv->mode_output)
++            continue;
++        for (int m = 0; m < priv->mode_output->count_modes; m++) {
++            drmModeModeInfo *known = &priv->mode_output->modes[m];
++            if ((!kmode->name[0] || !strcmp(kmode->name, known->name)) &&
++                kmode->clock == known->clock &&
++                kmode->hdisplay == known->hdisplay &&
++                kmode->hsync_start == known->hsync_start &&
++                kmode->hsync_end == known->hsync_end &&
++                kmode->htotal == known->htotal &&
++                kmode->vdisplay == known->vdisplay &&
++                kmode->vsync_start == known->vsync_start &&
++                kmode->vsync_end == known->vsync_end &&
++                kmode->vtotal == known->vtotal) {
++                kmode->vrefresh = known->vrefresh;
++                if (!kmode->name[0]) {
++                    strncpy(kmode->name, known->name, DRM_DISPLAY_MODE_LEN - 1);
++                    kmode->name[DRM_DISPLAY_MODE_LEN - 1] = 0;
++                }
++                xf86DrvMsg(scrn->scrnIndex, X_INFO,
++                           "EtherPocket advertised refresh: %s %u Hz\n",
++                           kmode->name, kmode->vrefresh);
++                return;
++            }
++        }
++    }
++    xf86DrvMsg(scrn->scrnIndex, X_WARNING,
++               "EtherPocket no exact advertised timing match: %s\n", kmode->name);
+ 
+ }
+ 

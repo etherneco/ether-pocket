@@ -1,0 +1,15 @@
+[Unit]
+Description=EtherLocation private location service
+After=dbus.service
+[Service]
+Type=dbus
+BusName=com.etherneco.EtherLocation1
+ExecStart=/usr/bin/python3 /usr/share/etherlocation/service.py
+UMask=0077
+NoNewPrivileges=yes
+PrivateTmp=yes
+RestrictSUIDSGID=yes
+TimeoutStopSec=40
+KillMode=mixed
+[Install]
+WantedBy=default.target

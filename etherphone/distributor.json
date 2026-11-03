@@ -1,0 +1,1 @@
+{"schemaVersion":1,"name":"EtherPhone","slug":"etherphone","version":"0.1.0","platform":"linux","architecture":"arm64","format":"deb","package":"etherphone_0.1.0_arm64.deb","settingsRoute":"calls","service":"com.etherneco.EtherPhone1","publication":"Local engineering package via existing distributor; cellular calling unverified"}

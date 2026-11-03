@@ -1,0 +1,83 @@
+Internal audio bring-up — 2026-10-16
+==================================
+
+Initial native system: PipeWire/WirePlumber running, but /proc/asound/cards
+reported no soundcards and /dev/snd contained only the ALSA timer. This
+was a missing kernel driver problem, not a desktop volume setting.
+
+The base downstream kernel does not contain Qualcomm's audio techpack.
+The original Android audio modules target 4.14.117-perf+ and a different
+signing key; they were not forced into the native kernel.
+
+Build and installation
+----------------------
+
+Sources: LineageOS/android_kernel_oneplus_sm8150 commit
+77a0c0f8a59c868236c495373d98b03a819c0108, techpack/audio, SM8150 config.
+The archive is saved under sources/lineage-sm8150-77a0c0f.tar.gz.
+scripts/build-audio-drivers.sh builds against the existing native kernel
+and output directory, strips debug data, and signs modules with the
+existing kernel key. scripts/patch-audio-pdr.py replays already-completed
+PDR discovery to a dependent notifier loaded later. The upstream header
+explicitly notes that late registration can otherwise miss readiness.
+
+scripts/install-phone-audio.py installs modules under
+/lib/modules/4.14.117-perf/extra/audio and enables etherpocket-audio.service.
+The startup script loads modules, sets ADSP restart_level=RELATED, boots
+ADSP and waits for a real ALSA control device. TFA98xx firmware is copied
+from the read-only Android vendor partition into /lib/firmware/tfa98xx.cnt.
+
+Observed hardware progress and remaining checks
+-----------------------------------------------
+
+Initial live module loading succeeded with matching symbol versions and
+signatures. ADSP booted ONLINE, APR RPMSG connected, SLIMbus enumerated the
+WCD934x/Tavil chip (major 0x108, minor 0x1), and both TFA9874 amplifiers
+were detected at I2C 0-0034 and 0-0035. ALSA card registration did not
+complete before the PDR replay patch was installed.
+
+Live unloading is unsafe in these downstream drivers: swr/q6 module exit
+produced kernel faults and left q6 unloading. Do not unload/reload them
+to test changes; use a hardware restart. The phone remained accessible
+over USB SSH. Wi-Fi was reconnected after restarting the PD mapper and
+its dependent services.
+
+After a confirmed physical restart, boot ID
+5c322fc4-4236-4dbc-b0d1-4fa0a2b506cf, the audio service completed
+successfully and ALSA registered sm8150-tavil-snd-card as card 0.
+The TFA container firmware loaded, including both calibrated speaker
+impedances. Both amplifiers reported tfa_dev_start success during playback.
+
+config/audio supplies a native UCM2 HiFi/Speaker profile. It uses PCM
+hw:${CardId},0, QUAT_MI2S_RX routed from MultiMedia1, stereo 48 kHz S24_LE,
+the TFA speaker profile, and disables the route when unused. Lookup
+aliases cover both the ALSA driver name and kernel module name. This
+avoids probing dozens of unrelated telephony/offload PCM devices.
+
+Initial 16-bit backend tests were silent despite successful PCM writes
+and amplifier startup. The factory audio_platform_info.xml explicitly
+requires 24 bits for SND_DEVICE_OUT_SPEAKER. Changing QUAT_MI2S_RX Format
+to S24_LE produced a clean pulsed test tone, confirmed by the user.
+WirePlumber then exposed the HiFi profile after restarting its audio stack.
+HiFi was selected and Phone speakers made default, unmuted at 45 percent.
+The startup service now applies this backend format before PipeWire probes
+PCM capabilities. Driver startup across restart is verified; the final
+24-bit configuration has been tested live, not by another physical restart.
+
+The temporary loss of touch was separately traced to bootloader-supplied
+androidboot.mode=charger: the touchscreen driver refused probe before
+audio loaded. A normal restart restored touch, and touch remained present
+while the audio service was started in that normal boot. Avoid starting
+the phone from charger mode when testing touch.
+
+Diagnostic tests also set runtime Playback 0 Volume and sent the NXP DSP
+volume RPC. These were not sufficient to produce sound with a 16-bit
+backend. The user confirmed that sound works through the default
+PipeWire output in the final UCM test. PCM0 used MMAP_INTERLEAVED/S32_LE
+at 48 kHz stereo, and the TFA backend reported 24-bit samples in 32-bit
+slots. Touch remained registered and audio startup is enabled again.
+
+Evidence: evidence/audio-first-bringup-2026-10-16.txt,
+evidence/audio-boot-2026-10-16.txt, evidence/audio-verified-2026-10-16.txt,
+evidence/audio-24bit-2026-10-16.txt
+and build/audio-driver-build.log. No boot partition was changed for this work.

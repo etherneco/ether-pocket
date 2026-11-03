@@ -1,0 +1,45 @@
+"""Activate the exact SMS shell stage only after its isolated acceptance passes."""
+from pathlib import Path
+import hashlib,json,runpy,shlex,subprocess
+ROOT=Path(__file__).resolve().parent.parent
+SSH=runpy.run_path(str(ROOT/'scripts/deploy-ethermobile.py'))['SSH']
+if __name__=='__main__':
+ data=json.loads((ROOT/'evidence/ethersms-shell-stage.json').read_text());assert data['qa_passed']
+ assert hashlib.sha256((ROOT/'build/ethershell-sms_2.1.0_arm64.deb').read_bytes()).hexdigest()==data['package_sha256']
+ acceptance=json.loads((ROOT/'evidence/ethersms-settings-device/acceptance.json').read_text());assert set(acceptance)=={'narrow','landscape','external'} and all(v['exit']==0 for v in acceptance.values())
+ source=r'''
+import json,os,pathlib,subprocess,time,socket
+stage=pathlib.Path(STAGE);old=pathlib.Path(PREVIOUS)
+pids=subprocess.check_output(['pgrep','-u','1000','-x','ethershell'],text=True).split();assert len(pids)==1
+proc=pathlib.Path('/proc')/pids[0];assert (proc/'exe').resolve()==old/'usr/bin/ethershell'
+env=dict(x.split('=',1) for x in (proc/'environ').read_bytes().decode().split('\0') if '=' in x)
+launcher=pathlib.Path('/home/mobian/.local/bin/ethershell2-start');previous=launcher.read_bytes()
+backup=launcher.with_name('ethershell2-start.before-'+stage.name)
+if not backup.exists():backup.write_bytes(previous);backup.chmod(0o755);os.chown(backup,1000,1000)
+assert backup.read_bytes()==previous
+newenv=dict(env,ETHERSHELL_SOFT_BLANK='1',PATH=str(stage/'usr/bin')+':'+env.get('PATH','/usr/bin:/bin'),ETHERSHELL_PROFILE_DEFAULT=str(stage/'usr/share/ethershell/profiles.json'))
+def run(action,directory,environment):
+ command=['/usr/sbin/runuser','-u','mobian','--','/usr/bin/python3',str(directory/'usr/share/ethershell/current_session.py'),action]
+ if action=='stop':subprocess.run(command,env=environment,check=True,timeout=20,capture_output=True)
+ else:
+  with open('/var/tmp/ethersms-shell-launch.log','ab') as log:subprocess.Popen(command,env=environment,stdin=subprocess.DEVNULL,stdout=log,stderr=log,start_new_session=True)
+def request(data):
+ endpoint='/run/user/1000/ethershell-control-experience-'+env['DISPLAY'].replace(':','').replace('.','-')
+ with socket.socket(socket.AF_UNIX,socket.SOCK_STREAM) as client:
+  client.settimeout(10);client.connect(endpoint);client.sendall(json.dumps(data).encode()+b'\n');return client.recv(8192).decode().strip()
+try:
+ run('stop',old,env)
+ text='#!/bin/sh\nset -eu\nexport ETHERSHELL_SOFT_BLANK=1\nexport PATH='+str(stage/'usr/bin')+':"$PATH"\nexport ETHERSHELL_PROFILE_DEFAULT='+newenv['ETHERSHELL_PROFILE_DEFAULT']+'\nexec /usr/bin/python3 '+str(stage/'usr/share/ethershell/current_session.py')+' "$@"\n'
+ temporary=launcher.with_suffix('.new');temporary.write_text(text);temporary.chmod(0o755);os.chown(temporary,1000,1000);temporary.replace(launcher)
+ run('start',stage,newenv);time.sleep(6)
+ found=subprocess.check_output(['pgrep','-u','1000','-x','ethershell'],text=True).split();assert len(found)==1 and (pathlib.Path('/proc')/found[0]/'exe').resolve()==stage/'usr/bin/ethershell'
+ assert request({'command':'settings-page','route':'sms'})=='ok';time.sleep(1.2)
+ state=json.loads(request({'command':'settings-state'}));assert state['route']=='sms'
+ assert request({'command':'settings-screenshot'})=='ok'
+except BaseException:
+ launcher.write_bytes(previous);launcher.chmod(0o755);os.chown(launcher,1000,1000)
+ run('stop',stage,newenv);run('start',old,env);raise
+print(json.dumps({'stage':str(stage),'previous':str(old),'rollback_launcher':str(backup),'pid':found[0],'settings_route':state['route'],'services':subprocess.run(['systemctl','is-active','NetworkManager','ssh','bluetooth','etherpocket-modem','ModemManager'],capture_output=True,text=True).stdout.splitlines()}))
+'''.replace('STAGE',repr(data['stage'])).replace('PREVIOUS',repr(data['previous']))
+ r=subprocess.run(SSH+['python3 -c '+shlex.quote(source)],capture_output=True,timeout=80,check=True);result=json.loads(r.stdout)
+ (ROOT/'evidence/ethersms-shell-deployment.json').write_text(json.dumps(result,indent=2)+'\n');print(json.dumps(result,indent=2))

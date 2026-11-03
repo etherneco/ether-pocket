@@ -1,0 +1,14 @@
+[Desktop Entry]
+Type=Application
+Name=EtherMobile
+Comment=Cellular connectivity and modem diagnostics
+Exec=ethermobile
+Icon=ethermobile
+Terminal=false
+Categories=Network;Settings;
+Keywords=Mobile;Cellular;SIM;APN;LTE;Modem;
+Actions=Diagnostics;
+
+[Desktop Action Diagnostics]
+Name=Modem diagnostics
+Exec=ethermobile --doctor

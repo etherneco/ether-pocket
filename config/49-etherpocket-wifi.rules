@@ -1,0 +1,8 @@
+// EtherShell can be started by the deployment launcher outside the seat's
+// logind session. Authorize only Wi-Fi radio control for the device owner.
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.freedesktop.NetworkManager.enable-disable-wifi" &&
+        subject.user == "mobian") {
+        return polkit.Result.YES;
+    }
+});

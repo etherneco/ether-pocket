@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "name": "EtherLock",
+  "slug": "etherlock",
+  "family": "etherlock",
+  "package": "etherlock_0.1.0_arm64.deb",
+  "platform": "linux",
+  "format": "deb",
+  "settingsRoute": "security",
+  "service": "com.etherneco.EtherLock1",
+  "version": "0.1.0",
+  "architecture": "arm64",
+  "channel": "engineering",
+  "releaseStatus": "staged-no-automatic-locking",
+  "notes": "Requires attended local authentication, recovery and all-display acceptance. Existing Etherneco distributor only; no remote publication."
+}

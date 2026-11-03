@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=EtherPhone
+Comment=Native cellular dialer; calling and emergency support unverified
+Exec=etherphone
+Icon=call-start
+Terminal=false
+Categories=Telephony;Network;
+StartupWMClass=etherphone

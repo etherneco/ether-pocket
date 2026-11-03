@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.etherneco.EtherNotifications1
+Exec=/usr/bin/python3 -I /usr/share/ethernotifications/service.py
+SystemdService=ethernotifications.service

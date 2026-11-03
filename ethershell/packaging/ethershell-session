@@ -1,0 +1,20 @@
+#!/bin/sh
+set -eu
+export XDG_SESSION_TYPE=x11
+export XDG_CURRENT_DESKTOP=EtherShell
+export QT_QPA_PLATFORM=xcb
+export QT_QUICK_BACKEND=software
+export MOZ_USE_XINPUT2=1
+export QT_QUICK_CONTROLS_MOBILE=1
+unset GDK_CORE_DEVICE_EVENTS QT_XCB_NO_XI2 QT_XCB_NO_TOUCH
+if [ -x /usr/bin/unclutter-xfixes ]; then
+    /usr/bin/ethershell-touch-cursor &
+fi
+openbox &
+wm_pid=$!
+if [ -x /usr/lib/policykit-1-mate/polkit-mate-authentication-agent-1 ]; then
+    /usr/lib/policykit-1-mate/polkit-mate-authentication-agent-1 &
+fi
+cleanup() { kill "$wm_pid" 2>/dev/null || true; }
+trap cleanup EXIT INT TERM
+ethershell

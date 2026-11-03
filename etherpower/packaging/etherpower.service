@@ -1,0 +1,31 @@
+[Unit]
+Description=EtherPocket controlled power policy and battery history
+After=dbus.service etherhardware.service
+Wants=etherhardware.service
+
+[Service]
+Type=dbus
+BusName=com.etherneco.EtherPower1
+ExecStart=/usr/bin/python3 -I /usr/share/etherpower/service.py
+StateDirectory=etherpower
+StateDirectoryMode=0700
+UMask=0077
+Restart=on-failure
+RestartSec=5
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectKernelTunables=yes
+ReadWritePaths=-/sys/devices/system/cpu/cpufreq
+ReadWritePaths=-/sys/devices/platform/soc/2c00000.qcom,kgsl-3d0/devfreq/2c00000.qcom,kgsl-3d0
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+RestrictAddressFamilies=AF_UNIX AF_NETLINK
+RestrictSUIDSGID=yes
+LockPersonality=yes
+
+[Install]
+WantedBy=multi-user.target

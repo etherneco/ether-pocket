@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=EtherPocket launcher
+Comment=Open the application launcher
+Exec=xfce4-appfinder
+Icon=system-run
+Terminal=false
+Categories=Utility;

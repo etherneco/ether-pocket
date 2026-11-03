@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=USB Files
+Name[pl]=Pliki USB
+Comment=Eject ETHERPOCKET on the computer to access its files on the phone
+Comment[pl]=Wysuń ETHERPOCKET na komputerze, aby otworzyć pliki na telefonie
+Exec=thunar /home/mobian/USB
+Icon=drive-removable-media-usb
+Terminal=false
+Categories=Utility;FileManager;

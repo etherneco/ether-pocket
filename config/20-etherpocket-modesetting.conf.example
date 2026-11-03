@@ -1,0 +1,8 @@
+# Install in /etc/X11/xorg.conf.d ONLY after confirming compatible DRM/KMS
+# and Mesa EGL/GBM. No hard-coded card number or output name.
+Section "Device"
+    Identifier "EtherPocket KMS"
+    Driver "modesetting"
+    Option "AccelMethod" "glamor"
+EndSection
+# DRI3 is probed at runtime; do not claim it from this file alone.

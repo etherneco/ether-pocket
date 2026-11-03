@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE policyconfig PUBLIC "-//freedesktop//DTD PolicyKit Policy Configuration 1.0//EN" "http://www.freedesktop.org/standards/PolicyKit/1/policyconfig.dtd">
+<policyconfig>
+ <vendor>Etherneco</vendor>
+ <action id="com.etherneco.etherhardware.clear-history">
+  <description>Clear shared hardware diagnostic history</description>
+  <message>Authenticate to clear the hardware diagnostic history</message>
+  <defaults><allow_any>no</allow_any><allow_inactive>no</allow_inactive><allow_active>auth_admin</allow_active></defaults>
+ </action>
+ <action id="com.etherneco.etherhardware.install-tools">
+  <description>Install reviewed Debian hardware diagnostic tools</description>
+  <message>Authenticate to install the reviewed userspace diagnostic tools</message>
+  <defaults><allow_any>no</allow_any><allow_inactive>no</allow_inactive><allow_active>auth_admin</allow_active></defaults>
+  <annotate key="org.freedesktop.policykit.exec.path">/usr/libexec/etherhardware-repair</annotate>
+ </action>
+</policyconfig>

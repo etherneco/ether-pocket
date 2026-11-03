@@ -1,0 +1,8 @@
+[Unit]
+Description=GM1920 initial panel brightness
+After=lightdm.service
+[Service]
+Type=oneshot
+ExecStart=/bin/sh -c 'sleep 8; echo 0 > /sys/class/backlight/panel0-backlight/bl_power; echo 300 > /sys/class/backlight/panel0-backlight/brightness'
+[Install]
+WantedBy=graphical.target

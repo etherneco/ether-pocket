@@ -1,0 +1,9 @@
+[Desktop Entry]
+Type=Application
+Name=EtherSMS
+Comment=SMS, offline voice dictation and local draft assistance
+Exec=ethersms
+Icon=ethersms
+Terminal=false
+Categories=Network;Telephony;Chat;
+StartupWMClass=ethersms

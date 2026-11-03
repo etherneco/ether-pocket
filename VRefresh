@@ -1,0 +1,195 @@
+201:                    gbm_device_get_format_modifier_plane_count(drmmode->gbm,
+336:        prop = drmModeGetProperty(drmmode->fd, props->props[i]);
+361:            xf86DrvMsg(drmmode->scrn->scrnIndex, X_WARNING,
+536:        drmmode_CompareKModes(&drmmode_crtc->current_mode->mode_info, &mode_info) == 0)
+543:    mode->mode_info = mode_info;
+545:                                    &mode->mode_info,
+546:                                    sizeof(mode->mode_info),
+547:                                    &mode->blob_id);
+549:    xorg_list_add(&mode->entry, &drmmode_crtc->mode_list);
+598:                             drmmode_crtc->current_mode->blob_id);
+616:    if (mode->blob_id)
+617:        drmModeDestroyPropertyBlob(ms->fd, mode->blob_id);
+618:    xorg_list_del(&mode->entry);
+640:        if (!drmmode->reverse_prime_offload_mode) {
+654:        *fb_id = drmmode->fb_id;
+660:        ret = drmmode_bo_import(drmmode, &drmmode->front_bo,
+661:                                &drmmode->fb_id);
+666:        *fb_id = drmmode->fb_id;
+795:        ret = drmModeCreatePropertyBlob(drmmode->fd, ctm, sizeof(*ctm), &blob_id);
+803:    ret = drmModeObjectSetProperty(drmmode->fd,
+811:    drmModeDestroyPropertyBlob(drmmode->fd, blob_id);
+834:    if (drmmode->glamor)
+923:    ret = drmModeSetCrtc(drmmode->fd, drmmode_crtc->mode_crtc->crtc_id,
+970:        ret = dumb_bo_destroy(drmmode->fd, bo->dumb);
+1024:    ret = dumb_bo_map(drmmode->fd, bo->dumb);
+1036:    modesettingPtr ms = modesettingPTR(drmmode->scrn);
+1064:            return drmModeAddFB2WithModifiers(drmmode->fd, bo->width, bo->height,
+1071:    return drmModeAddFB(drmmode->fd, bo->width, bo->height,
+1072:                        drmmode->scrn->depth, drmmode->kbpp,
+1085:    if (drmmode->glamor) {
+1092:        switch (drmmode->scrn->depth) {
+1108:        num_modifiers = get_modifiers_set(drmmode->scrn, format, &modifiers,
+1112:            bo->gbm = gbm_bo_create_with_modifiers(drmmode->gbm, width, height,
+1123:        bo->gbm = gbm_bo_create(drmmode->gbm, width, height, format,
+1130:    bo->dumb = dumb_bo_create(drmmode->fd, width, height, bpp);
+1141:        dumb_bo_destroy(drmmode->fd, ppriv->backing_bo);
+1147:        dumb_get_bo_from_fd(drmmode->fd, fd_handle, pitch, size);
+1166:        xf86DrvMsg(drmmode->scrn->scrnIndex, X_WARNING,
+1284:    if (drmModePageFlip(drmmode->fd, drmmode_crtc->mode_crtc->crtc_id,
+1386:    mode->status = MODE_OK;
+1388:    mode->Clock = kmode->clock;
+1390:    mode->HDisplay = kmode->hdisplay;
+1391:    mode->HSyncStart = kmode->hsync_start;
+1392:    mode->HSyncEnd = kmode->hsync_end;
+1393:    mode->HTotal = kmode->htotal;
+1394:    mode->HSkew = kmode->hskew;
+1396:    mode->VDisplay = kmode->vdisplay;
+1397:    mode->VSyncStart = kmode->vsync_start;
+1398:    mode->VSyncEnd = kmode->vsync_end;
+1399:    mode->VTotal = kmode->vtotal;
+1400:    mode->VScan = kmode->vscan;
+1402:    mode->Flags = kmode->flags; //& FLAG_BITS;
+1403:    mode->name = strdup(kmode->name);
+1405:    if (kmode->type & DRM_MODE_TYPE_DRIVER)
+1406:        mode->type = M_T_DRIVER;
+1407:    if (kmode->type & DRM_MODE_TYPE_PREFERRED)
+1408:        mode->type |= M_T_PREFERRED;
+1418:    kmode->clock = mode->Clock;
+1419:    kmode->hdisplay = mode->HDisplay;
+1420:    kmode->hsync_start = mode->HSyncStart;
+1421:    kmode->hsync_end = mode->HSyncEnd;
+1422:    kmode->htotal = mode->HTotal;
+1423:    kmode->hskew = mode->HSkew;
+1425:    kmode->vdisplay = mode->VDisplay;
+1426:    kmode->vsync_start = mode->VSyncStart;
+1427:    kmode->vsync_end = mode->VSyncEnd;
+1428:    kmode->vtotal = mode->VTotal;
+1429:    kmode->vscan = mode->VScan;
+1431:    kmode->flags = mode->Flags; //& FLAG_BITS;
+1432:    if (mode->name)
+1433:        strncpy(kmode->name, mode->name, DRM_DISPLAY_MODE_LEN);
+1434:    kmode->name[DRM_DISPLAY_MODE_LEN - 1] = 0;
+1453:        drmModeSetCrtc(drmmode->fd, drmmode_crtc->mode_crtc->crtc_id,
+1462:    PixmapPtr pixmap = drmmode->fbcon_pixmap;
+1471:    fbcon = drmModeGetFB(drmmode->fd, fbcon_id);
+1493:    drmmode->fbcon_pixmap = pixmap;
+1520:    if (fbcon_id == drmmode->fb_id) {
+1545:    if (drmmode->fbcon_pixmap)
+1546:        pScrn->pScreen->DestroyPixmap(drmmode->fbcon_pixmap);
+1547:    drmmode->fbcon_pixmap = NULL;
+1647:    drmModeMoveCursor(drmmode->fd, drmmode_crtc->mode_crtc->crtc_id, x, y);
+1663:    ret = drmModeSetCursor2(drmmode->fd, drmmode_crtc->mode_crtc->crtc_id,
+1670:        ret = drmModeSetCursor(drmmode->fd, drmmode_crtc->mode_crtc->crtc_id,
+1681:        drmmode_crtc->drmmode->sw_cursor = TRUE;
+1726:    drmModeSetCursor(drmmode->fd, drmmode_crtc->mode_crtc->crtc_id, 0,
+1758:    if (drmModeCreatePropertyBlob(drmmode->fd, lut, sizeof(lut), &blob_id))
+1761:    drmModeObjectSetProperty(drmmode->fd, crtc_id, DRM_MODE_OBJECT_CRTC,
+1764:    drmModeDestroyPropertyBlob(drmmode->fd, blob_id);
+1777:        drmModeCrtcSetGamma(drmmode->fd, drmmode_crtc->mode_crtc->crtc_id,
+1795:        if (drmmode->fb_id) {
+1796:            drmModeRmFB(drmmode->fd, drmmode->fb_id);
+1797:            drmmode->fb_id = 0;
+1851:        drmModeRmFB(drmmode->fd, ppriv->fb_id);
+1876:        drmModeAddFB(drmmode->fd, ppix->drawable.width,
+1893:    if (drmmode->reverse_prime_offload_mode)
+1941:                           width, height, drmmode->kbpp)) {
+1957:    if (drmmode->gbm)
+2016:                                                 drmmode->kbpp,
+2042:        drmModeRmFB(drmmode->fd, drmmode_crtc->rotate_fb_id);
+2128:    blob = drmModeGetPropertyBlob(drmmode->fd, blob_id);
+2214:        xf86DrvMsg(drmmode->scrn->scrnIndex, X_ERROR,
+2220:    kplane_res = drmModeGetPlaneResources(drmmode->fd);
+2222:        xf86DrvMsg(drmmode->scrn->scrnIndex, X_ERROR,
+2231:        kplane = drmModeGetPlane(drmmode->fd, kplane_res->planes[i]);
+2236:            is_plane_assigned(drmmode->scrn, kplane->plane_id)) {
+2243:        props = drmModeObjectGetProperties(drmmode->fd, plane_id,
+2246:            xf86DrvMsg(drmmode->scrn->scrnIndex, X_ERROR,
+2341:    if (drmmode->vrr_prop_id)
+2351:    drmmode->vrr_prop_id = drmmode_crtc_get_prop_id(drm_fd,
+2379:        drmModeGetCrtc(drmmode->fd, mode_res->crtcs[num]);
+2384:    props = drmModeObjectGetProperties(drmmode->fd, mode_res->crtcs[num],
+2398:    drmModeSetCursor(drmmode->fd, drmmode_crtc->mode_crtc->crtc_id, 0, 0, 0);
+2400:    drmmode_crtc_vrr_init(drmmode->fd, crtc);
+2418:        drmmode_crtc->use_gamma_lut = xf86ReturnOptValBool(drmmode->Options,
+2427:        drmmode->use_ctm = TRUE;
+2522:        drmModeGetConnector(drmmode->fd, drmmode_output->output_id);
+2614:        koutput_get_prop_blob(drmmode->fd, koutput, "TILE");
+2634:    idx = koutput_get_prop_idx(drmmode->fd, koutput,
+2700:        koutput_get_prop_blob(drmmode->fd, koutput, "EDID");
+2769:        drmModeConnectorSetProperty(drmmode->fd, koutput->connector_id,
+2824:        drmmode_prop = drmModeGetProperty(drmmode->fd, mode_output->props[i]);
+2858:    if (drmmode->use_ctm) {
+2976:            drmModeConnectorSetProperty(drmmode->fd, drmmode_output->output_id,
+2995:                    drmModeConnectorSetProperty(drmmode->fd,
+3201:        drmModeGetConnector(drmmode->fd, mode_res->connectors[num]);
+3205:    path_blob = koutput_get_prop_blob(drmmode->fd, koutput, "PATH");
+3206:    i = koutput_get_prop_idx(drmmode->fd, koutput, DRM_MODE_PROP_RANGE, RR_PROPERTY_NON_DESKTOP);
+3238:        kencoders[i] = drmModeGetEncoder(drmmode->fd, koutput->encoders[i]);
+3245:        if ((s = xf86GetOptValString(drmmode->Options, OPTION_ZAPHOD_HEADS))) {
+3249:            if (!drmmode->is_secondary && (num != 0))
+3251:            else if (drmmode->is_secondary && (num != 1))
+3293:        props = drmModeObjectGetProperties(drmmode->fd,
+3300:            koutput_get_prop_id(drmmode->fd, koutput, DRM_MODE_PROP_ENUM,
+3313:	         drmmode_connector_check_vrr_capable(drmmode->fd,
+3393:    ScrnInfoPtr scrn = drmmode->scrn;
+3396:    if (!drmmode->glamor)
+3412:    ScreenPtr screen = xf86ScrnToScreen(drmmode->scrn);
+3415:    if (!drmmode_set_pixmap_bo(drmmode, screen_pixmap, &drmmode->front_bo))
+3432:    int kcpp = (drmmode->kbpp + 7) / 8;
+3444:    old_pitch = drmmode_bo_get_pitch(&drmmode->front_bo);
+3445:    old_front = drmmode->front_bo;
+3446:    old_fb_id = drmmode->fb_id;
+3447:    drmmode->fb_id = 0;
+3449:    if (!drmmode_create_bo(drmmode, &drmmode->front_bo,
+3450:                           width, height, drmmode->kbpp))
+3453:    pitch = drmmode_bo_get_pitch(&drmmode->front_bo);
+3459:    if (!drmmode->gbm) {
+3465:    if (drmmode->shadow_enable) {
+3470:        free(drmmode->shadow_fb);
+3471:        drmmode->shadow_fb = new_pixels;
+3474:    if (drmmode->shadow_enable2) {
+3477:        free(drmmode->shadow_fb2);
+3478:        drmmode->shadow_fb2 = fb2;
+3500:        drmModeRmFB(drmmode->fd, old_fb_id);
+3507:    drmmode_bo_destroy(drmmode, &drmmode->front_bo);
+3508:    drmmode->front_bo = old_front;
+3512:    drmmode->fb_id = old_fb_id;
+3538:    lessees = drmModeListLessees(drmmode->fd);
+3620:    lease_fd = drmModeCreateLease(drmmode->fd, objects, nobjects, 0, &lease_private->lessee_id);
+3646:    if (drmModeRevokeLease(drmmode->fd, lease_private->lessee_id) == 0) {
+3671:    ret = drmGetCap(drmmode->fd, DRM_CAP_DUMB_BUFFER, &value);
+3680:    drmmode->scrn = pScrn;
+3681:    drmmode->cpp = cpp;
+3682:    mode_res = drmModeGetResources(drmmode->fd);
+3725:    if (drmmode->glamor) {
+3767:                drmModeSetCrtc(drmmode->fd, drmmode_crtc->mode_crtc->crtc_id,
+3967:    ScrnInfoPtr scrn = drmmode->scrn;
+4016:    mode_res = drmModeGetResources(drmmode->fd);
+4097:    while ((dev = udev_monitor_receive_device(drmmode->uevent_monitor))) {
+4134:    drmmode->uevent_handler =
+4138:    drmmode->uevent_monitor = mon;
+4146:    if (drmmode->uevent_handler) {
+4147:        struct udev *u = udev_monitor_get_udev(drmmode->uevent_monitor);
+4149:        xf86RemoveGeneralHandler(drmmode->uevent_handler);
+4151:        udev_monitor_unref(drmmode->uevent_monitor);
+4172:    if (!drmmode_create_bo(drmmode, &drmmode->front_bo, width, height, bpp))
+4174:    pScrn->displayWidth = drmmode_bo_get_pitch(&drmmode->front_bo) / cpp;
+4184:            dumb_bo_create(drmmode->fd, width, height, bpp);
+4192:    return drmmode_bo_map(drmmode, &drmmode->front_bo);
+4203:    ret = dumb_bo_map(drmmode->fd, ppriv->backing_bo);
+4220:        ret = dumb_bo_map(drmmode->fd, drmmode_crtc->cursor_bo);
+4233:    if (drmmode->fb_id) {
+4234:        drmModeRmFB(drmmode->fd, drmmode->fb_id);
+4235:        drmmode->fb_id = 0;
+4238:    drmmode_bo_destroy(drmmode, &drmmode->front_bo);
+4244:        dumb_bo_destroy(drmmode->fd, drmmode_crtc->cursor_bo);
+4260:    ret = drmGetCap(drmmode->fd, DRM_CAP_DUMB_PREFERRED_DEPTH, &value);
+4268:    mode_res = drmModeGetResources(drmmode->fd);
+4277:    bo = dumb_bo_create(drmmode->fd, mode_res->min_width, mode_res->min_height,
+4284:    ret = drmModeAddFB(drmmode->fd, mode_res->min_width, mode_res->min_height,
+4289:        dumb_bo_destroy(drmmode->fd, bo);
+4293:    drmModeRmFB(drmmode->fd, fb_id);
+4296:    dumb_bo_destroy(drmmode->fd, bo);
+4310:    if (drmmode->vrr_prop_id && drmmode_crtc->vrr_enabled != enabled &&
+4314:                                 drmmode->vrr_prop_id,

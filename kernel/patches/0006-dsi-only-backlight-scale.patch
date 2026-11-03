@@ -1,0 +1,13 @@
+--- a/drivers/gpu/drm/msm/sde/sde_connector.c
++++ b/drivers/gpu/drm/msm/sde/sde_connector.c
+@@ -530,6 +530,10 @@
+ 		SDE_ERROR("Invalid params sde_connector null\n");
+ 		return -EINVAL;
+ 	}
++
++	/* DP/virtual connectors do not carry a struct dsi_display. */
++	if (c_conn->base.connector_type != DRM_MODE_CONNECTOR_DSI)
++		return 0;
+ 
+ 	dsi_display = c_conn->display;
+ 	if (!dsi_display || !dsi_display->panel) {

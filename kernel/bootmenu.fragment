@@ -1,0 +1,2 @@
+# Optional initramfs boot manager: original Android kernel handoff.
+CONFIG_KEXEC=y

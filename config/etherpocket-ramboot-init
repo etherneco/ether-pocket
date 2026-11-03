@@ -1,0 +1,16 @@
+#!/bin/busybox sh
+# Native initramfs: operate only on RAM. Never mount Android block volumes.
+export PATH=/usr/sbin:/usr/bin:/sbin:/bin
+mount -t proc proc /proc
+mount -t sysfs sysfs /sys
+mount -t devtmpfs devtmpfs /dev
+mkdir -p /run /dev/pts /dev/shm
+mount -t tmpfs tmpfs /run
+mount -t devpts devpts /dev/pts
+mount -t tmpfs tmpfs /dev/shm
+case "$(stat -f -c %T /)" in
+    ramfs|tmpfs) ;;
+    *) echo 'EtherPocket refused non-RAM root.' > /dev/console; exec sh ;;
+esac
+echo 'EtherPocket native Mobian/X11 RAM test starting' > /dev/console
+exec /sbin/init

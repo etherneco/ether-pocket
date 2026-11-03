@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=EtherShell 2 (Experimental)
+Comment=Separate EtherSurface session; XFCE remains the default
+Exec=/usr/bin/ethershell2-session
+TryExec=/usr/bin/ethershell
+Type=Application
+DesktopNames=EtherShell2;

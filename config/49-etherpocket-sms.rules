@@ -1,0 +1,9 @@
+// EtherPocket's existing user launcher runs outside the seat's logind session.
+// Give only the device owner the same SMS action allowed to an active desktop.
+// No modem power, data, SIM-lock or firmware permissions are granted here.
+polkit.addRule(function(action, subject) {
+    if (action.id == "org.freedesktop.ModemManager1.Messaging" &&
+        subject.user == "mobian") {
+        return polkit.Result.YES;
+    }
+});

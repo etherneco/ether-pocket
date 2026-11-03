@@ -1,0 +1,15 @@
+[Unit]
+Description=EtherPocket USB flash drive and local file handover
+After=etherpocket-usb-debug.service
+Requires=etherpocket-usb-debug.service
+ConditionPathExists=/var/lib/etherpocket/usb-storage.img
+
+[Service]
+Type=simple
+ExecStart=/usr/local/sbin/etherpocket-usb-storage
+Restart=on-failure
+RestartSec=5
+TimeoutStopSec=15
+
+[Install]
+WantedBy=multi-user.target

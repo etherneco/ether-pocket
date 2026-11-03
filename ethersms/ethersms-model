@@ -1,0 +1,65 @@
+#!/usr/bin/python3
+"""Explicit checksum-verified multilingual model installation and approved downloads."""
+import hashlib
+import os
+from pathlib import Path
+import re
+import shutil
+import sys
+import tempfile
+import urllib.request
+import urllib.parse
+os.umask(0o077)
+folder=Path.home()/'.local/share/Etherneco/EtherSMS/models'
+def main(args):
+    folder.mkdir(parents=True,exist_ok=True)
+    if args==['list']:
+        for f in folder.glob('*.bin'):print(f.name,f.stat().st_size)
+        return
+    if len(args)==2 and args[0]=='remove':
+        if Path(args[1]).name!=args[1] or not args[1].endswith('.bin'):raise ValueError('Invalid model name')
+        (folder/args[1]).unlink();return
+    if args and args[0]=='download':
+        if len(args)!=4 or args[3]!='--approved' or args[1] not in ['tiny','base','small'] or not re.fullmatch('[a-fA-F0-9]{64}',args[2]):
+            raise ValueError('Download requires model name, trusted SHA-256 and explicit --approved consent')
+        class HttpsRedirect(urllib.request.HTTPRedirectHandler):
+            def redirect_request(self,req,fp,code,msg,headers,newurl):
+                parsed=urllib.parse.urlsplit(newurl)
+                if parsed.scheme!='https' or not parsed.hostname or not (parsed.hostname=='huggingface.co' or parsed.hostname.endswith('.huggingface.co') or parsed.hostname.endswith('.hf.co')):
+                    raise ValueError('Untrusted download redirect')
+                return super().redirect_request(req,fp,code,msg,headers,newurl)
+        with tempfile.TemporaryDirectory(prefix='ethersms-model-') as work:
+            source=Path(work)/('ggml-'+args[1]+'.bin')
+            url='https://huggingface.co/ggerganov/whisper.cpp/resolve/main/'+source.name
+            opener=urllib.request.build_opener(HttpsRedirect())
+            with opener.open(url,timeout=30) as response,source.open('xb') as dst:
+                total=0
+                while chunk:=response.read(1024*1024):
+                    total+=len(chunk)
+                    if total>600_000_000:raise ValueError('Download exceeds size limit')
+                    dst.write(chunk)
+            main(['install',str(source),args[2]])
+        return
+    if len(args)!=3 or args[0]!='install':raise ValueError('Usage: ethersms-model install LOCAL_MODEL PUBLISHER_SHA256 | list | remove NAME')
+    source=Path(args[1]);digest=args[2].lower()
+    if not re.fullmatch(r'ggml-(tiny|base|small)(-q[0-9]_[0-9])?\.bin',source.name):raise ValueError('Only multilingual tiny/base/small models accepted')
+    if not re.fullmatch('[a-f0-9]{64}',digest):raise ValueError('Trusted publisher SHA-256 required')
+    destination=folder/source.name
+    if source.stat().st_size>600_000_000 or destination.exists():raise ValueError('Model too large or already installed')
+    temporary=None
+    try:
+        with source.open('rb') as src,tempfile.NamedTemporaryFile(dir=folder,delete=False) as dst:
+            temporary=Path(dst.name);h=hashlib.sha256();total=0
+            while chunk:=src.read(1024*1024):
+                total+=len(chunk)
+                if total>600_000_000:raise ValueError('Model exceeds size limit')
+                h.update(chunk);dst.write(chunk)
+            dst.flush();os.fsync(dst.fileno())
+        if h.hexdigest()!=digest:raise ValueError('Checksum mismatch')
+        # Atomic install without overwriting an existing model.
+        os.link(temporary,destination)
+    finally:
+        if temporary:temporary.unlink(missing_ok=True)
+if __name__=='__main__':
+    try:main(sys.argv[1:])
+    except (OSError,ValueError) as e:print(str(e),file=sys.stderr);sys.exit(1)

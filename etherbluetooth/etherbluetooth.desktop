@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=EtherBluetooth
+Comment=Bluetooth devices and Driver Doctor
+Exec=etherbluetooth
+Icon=bluetooth
+Terminal=false
+Categories=Settings;HardwareSettings;

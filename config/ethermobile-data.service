@@ -1,0 +1,16 @@
+[Unit]
+Description=EtherMobile downstream IPA cellular data session
+After=ethermobile-ipa.service ModemManager.service NetworkManager.service systemd-resolved.service
+Requires=ethermobile-ipa.service ModemManager.service NetworkManager.service systemd-resolved.service
+
+[Service]
+Type=simple
+ExecStartPre=/usr/bin/python3 -u /usr/local/lib/ethermobile/ethermobile-data-wait.py
+ExecStart=/usr/bin/python3 -u /usr/local/lib/ethermobile/ethermobile-ipa-data.py --connect
+ExecStopPost=/usr/bin/python3 /usr/local/lib/ethermobile/ethermobile_data_status.py
+TimeoutStartSec=150
+TimeoutStopSec=35
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,32 @@
+[Unit]
+Description=EtherPocket Qualcomm Bluetooth UART transport
+After=systemd-udevd.service systemd-modules-load.service
+Before=bluetooth.service
+ConditionPathExists=/dev/ttyHS0
+ConditionPathExists=/sys/firmware/devicetree/base/vendor/bt_wcn3990/compatible
+StartLimitIntervalSec=120
+StartLimitBurst=3
+
+[Service]
+Type=notify
+NotifyAccess=main
+ExecStartPre=/usr/bin/python3 /usr/libexec/etherbluetooth/etherbluetooth-uart.py --check-kernel
+ExecStartPre=/usr/sbin/modprobe ether_hci_uart
+ExecStart=/usr/bin/python3 /usr/libexec/etherbluetooth/etherbluetooth-uart.py --apply
+Restart=on-failure
+RestartSec=5
+TimeoutStartSec=25
+TimeoutStopSec=15
+UMask=0077
+ProtectHome=true
+ProtectSystem=strict
+ReadWritePaths=/run/etherbluetooth /var/lib/etherbluetooth
+RuntimeDirectory=etherbluetooth
+RuntimeDirectoryMode=0755
+StateDirectory=etherbluetooth
+StateDirectoryMode=0700
+NoNewPrivileges=true
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
