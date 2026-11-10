@@ -1,6 +1,9 @@
 # EtherPocket capability presentation
 
-[Open the PowerPoint presentation (Polish)](EtherPocket.pptx). Six slides, approximately 3–5 minutes. Content status: 3 November 2026. Slide text is editable. Sources and material limitations are included in the speaker notes. The outline below is in English.
+- [English PowerPoint presentation](EtherPocket.en.pptx)
+- [Polish PowerPoint presentation](EtherPocket.pptx)
+
+Each version contains six slides, approximately 3–5 minutes. Content status: 3 November 2026. The English version is a separate translation, including speaker notes, and preserves the original screenshots and design. Slide text is editable. Sources and material limitations are included in the speaker notes. The outline below is in English.
 
 ## 1. EtherPocket: Linux in your pocket
 

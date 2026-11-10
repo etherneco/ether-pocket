@@ -10,7 +10,8 @@ The current reference device is the **OnePlus 7 Pro 5G GM1920**. This repository
 
 - [Detailed overview, architecture and use cases](docs/PROJECT.md)
 - [Verified capabilities and remaining limitations](docs/STATUS.md)
-- [Short PowerPoint presentation (Polish)](docs/presentation/EtherPocket.pptx)
+- [Short PowerPoint presentation (English)](docs/presentation/EtherPocket.en.pptx)
+- [PowerPoint presentation (Polish)](docs/presentation/EtherPocket.pptx)
 - [Presentation outline and demonstration notes](docs/presentation/README.md)
 - [Contribution guide](CONTRIBUTING.md)
 - [Deployment history and earlier reports](README.rst)
