@@ -1,3 +1,4 @@
+import "../qml/StructuredData.js" as Data
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -16,7 +17,7 @@ ColumnLayout {
  component Action:S.SettingsAction {tokens:page.tokens;Layout.fillWidth:true;enabled:!page.state.busy}
  component Status:S.SettingsStatus {tokens:page.tokens;Layout.fillWidth:true}
  Status {text:page.state.ready?(page.state.status||"Recovery not tested"):"EtherBackup service unavailable";state:"warning"}
- Status {visible:!!BackupControl.message;text:BackupControl.message}
+ Status {visible:!!BackupControl.message;text:Data.text(BackupControl.message)}
  Card {
   Row {title:"Backup & Restore";description:"Encrypted backups with a verified sample restore. Complete operating-system recovery has not been tested."}
   Action {text:"Unlock private backup details";onClicked:BackupControl.inspect()}
@@ -53,7 +54,7 @@ ColumnLayout {
   Action {text:"Restore to private review directory";onClicked:confirmation.open()}
  }
  Card {
-  Row {title:"Advanced";description:"Engine: Restic · Repository encryption required\nRetention: "+JSON.stringify(page.details.retention||{})+"\nLost passwords cannot be recovered. A same-device backup does not protect against storage failure.\nSystem configuration and databases need an administrator-reviewed offline apply and schema compatibility checks."}
+  Row {title:"Advanced";description:"Engine: Restic · Repository encryption required\nRetention: "+Data.text(page.details.retention||{})+"\nLost passwords cannot be recovered. A same-device backup does not protect against storage failure.\nSystem configuration and databases need an administrator-reviewed offline apply and schema compatibility checks."}
  }
  Dialog {id:confirmation;modal:true;width:Math.min(page.width-24,440);contentWidth:width-40;contentHeight:160;title:"Confirm isolated restore";standardButtons:Dialog.Ok|Dialog.Cancel;onAccepted:BackupControl.restore();contentItem:Text {text:"Restore the selected files into an administrator-only review directory? Checksums and SQLite integrity will be validated.";wrapMode:Text.WordWrap;color:page.tokens.ink}}
 }

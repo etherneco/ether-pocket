@@ -1,3 +1,4 @@
+import "../qml" as UI
 import QtQuick
 import QtQuick.Layouts
 import "../qml/settings" as S
@@ -23,7 +24,7 @@ ColumnLayout {
    Row {title:(modelData.name||modelData.type)+" · "+modelData.status;description:(modelData.physicalPresence||(modelData.physical?"Physical interface":"Derived"))+" · "+(modelData.units||"Units unverified")+"\n"+(modelData.reason||"")+"\nDriver: "+(modelData.driver||"Unknown")+" · Calibration: "+(modelData.calibration||"Unknown")}
    Action {text:"Test for 30 seconds";visible:!!modelData.measurementAvailable;onClicked:SensorControl.test(modelData.id)}
   }}
-  Row {visible:Object.keys(SensorControl.sample||{}).length>0;title:"Live diagnostic reading";description:JSON.stringify(SensorControl.sample)}
+  UI.DataView {tokens:page.tokens;Layout.fillWidth:true;visible:Object.keys(SensorControl.sample||{}).length>0;value:SensorControl.sample}
   Action {text:"Stop sensor test";visible:page.state.activeSubscriptions>0;onClicked:SensorControl.stopTest()}
  }
  Card {

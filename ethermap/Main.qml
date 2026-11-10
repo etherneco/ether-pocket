@@ -1,3 +1,4 @@
+import "../qml/StructuredData.js" as Data
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Controls as C
@@ -108,7 +109,7 @@ ApplicationWindow {
      Button {text:win.s.recording?(win.s.paused?"Resume":"Pause"):"Record";Layout.fillWidth:true;onClicked:{win.follow=true;Maps.send(win.s.recording?(win.s.paused?"resume":"pause"):"mode",win.s.recording?{}:{value:"Track Route"})}}
      Button {text:"Stop";Layout.fillWidth:true;onClicked:{win.follow=false;Maps.send("mode",{value:"Off"})}}
     }
-    Label {text:win.s.message||"";visible:text.length>0;Layout.fillWidth:true;wrapMode:Text.Wrap;color:"#efbc87";font.pixelSize:11;maximumLineCount:3;elide:Text.ElideRight}
+    Label {text:Data.text(win.s.message||"");visible:text.length>0;Layout.fillWidth:true;wrapMode:Text.Wrap;color:"#efbc87";font.pixelSize:11;maximumLineCount:3;elide:Text.ElideRight}
     Label {Layout.fillWidth:true;text:win.region?win.region.attribution:win.online?win.settings.tileAttribution||"© OpenStreetMap contributors":"No map dataset selected";textFormat:Text.PlainText;color:"#a5bac8";font.pixelSize:10;wrapMode:Text.Wrap}
    }
   }
@@ -147,7 +148,7 @@ ApplicationWindow {
    Input {id:mapHash;placeholderText:"Expected SHA256"}
    Action {text:"Download / resume region";enabled:license.checked&&!win.s.busy;onClicked:Maps.send("download",{url:mapUrl.text,sha256:mapHash.text,license:license.checked})}
    Action {text:"Pause download";enabled:!!win.s.busy;onClicked:Maps.send("downloadPause")}
-   Note {text:(win.s.progress||{}).state?JSON.stringify(win.s.progress):"Select an area by obtaining a licensed region dataset. Raster PNG/JPEG MBTiles only; vector packages are rejected. 2 GiB per dataset, 8 GiB total."}
+   Note {text:(win.s.progress||{}).state?Data.text(win.s.progress):"Select an area by obtaining a licensed region dataset. Raster PNG/JPEG MBTiles only; vector packages are rejected. 2 GiB per dataset, 8 GiB total."}
    Heading {text:"Optional IP fallback"}
    Note {text:"The configured server learns your public IP. It may identify only a city, carrier or VPN exit. No observations or tracks are uploaded. Requires Location permission. After consent, Locate/Follow/Record can request fallback automatically; Request IP estimate also requests it explicitly."}
    Input {id:ipEndpoint;placeholderText:"HTTPS IP JSON endpoint";text:win.settings.ipEndpoint||""}
@@ -199,7 +200,7 @@ ApplicationWindow {
    Repeater {model:(win.s.route||{}).steps||[];delegate:Note {required property var modelData;text:modelData.text+" · "+Math.round(modelData.distance)+" m"}}
    Action {text:"Follow position with route shown";enabled:!!(win.s.route||{}).line;onClicked:{win.follow=true;Maps.send("mode",{value:"Navigation"});infoPanel.close()}}
    Action {text:"Clear route";onClicked:Maps.send("routeClear")}
-   Note {text:win.s.message||""}
+   Note {text:Data.text(win.s.message||"")}
    Action {text:"Close";onClicked:infoPanel.close()}
   }}
  }

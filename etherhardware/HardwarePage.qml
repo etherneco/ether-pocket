@@ -1,3 +1,4 @@
+import "../qml" as UI
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -18,7 +19,6 @@ ColumnLayout {
  spacing:tokens.sectionGap
  function details(row){selected=row;advanced=false;detail.open()}
  function choose(value){category=value;filter="";Qt.callLater(function(){let p=hardware.parent;while(p){if(p.contentY!==undefined){p.contentY=0;break}p=p.parent}})}
- function pretty(value){return JSON.stringify(value,null,2)}
  function facts(row){
   let d=row.details||{};let lines=[]
   if(Array.isArray(d))return d.map(c=>c.id+": "+c.status+"\n"+(c.failureReason||"Verified for the reported scope")).join("\n\n")
@@ -76,20 +76,22 @@ ColumnLayout {
     S.SettingsStatus {tokens:hardware.tokens;Layout.fillWidth:true;text:hardware.selected.reason||"Evidence is scoped to this component"}
     S.SettingsStatus {tokens:hardware.tokens;Layout.fillWidth:true;text:hardware.facts(hardware.selected)}
     S.SettingsAction {tokens:hardware.tokens;Layout.fillWidth:true;text:hardware.advanced?"Hide driver and technical evidence":"Show driver and technical evidence";onClicked:hardware.advanced=!hardware.advanced}
-    S.SettingsStatus {tokens:hardware.tokens;Layout.fillWidth:true;visible:hardware.advanced;wrapMode:Text.WrapAnywhere;text:hardware.pretty({details:hardware.selected.details||{},driver:hardware.selected.driver||{},nodes:hardware.selected.nodes||[],service:hardware.selected.service||null,path:hardware.selected.path||"",verifiedAt:hardware.selected.verifiedAt||null})}
+    UI.DataView {tokens:hardware.tokens;Layout.fillWidth:true;visible:hardware.advanced;value:({details:hardware.selected.details||{},driver:hardware.selected.driver||{},nodes:hardware.selected.nodes||[],service:hardware.selected.service||null,path:hardware.selected.path||"",verifiedAt:hardware.selected.verifiedAt||null})}
    }
   }
   footer:S.SettingsAction {tokens:hardware.tokens;text:"Close";onClicked:detail.close()}
  }
  S.SettingsBottomSheet {id:sessionSheet;tokens:hardware.tokens;title:"Session evidence";standardButtons:Dialog.Close
   contentItem:ScrollView {implicitHeight:Math.min(420,sessionSheet.parent.height/sessionSheet.scale-150);clip:true;contentWidth:availableWidth
-   S.SettingsStatus {tokens:hardware.tokens;width:parent.width;text:hardware.pretty(Hardware.session)}
+   UI.DataView {tokens:hardware.tokens;width:parent.width;value:Hardware.session}
   }
   footer:S.SettingsAction {tokens:hardware.tokens;text:"Close";onClicked:sessionSheet.close()}
  }
  S.SettingsBottomSheet {id:repairSheet;tokens:hardware.tokens;title:"Review diagnostic tool";standardButtons:Dialog.Close
   contentItem:ColumnLayout {spacing:12
-   S.SettingsStatus {tokens:hardware.tokens;Layout.fillWidth:true;text:Hardware.repairPlan.package?hardware.pretty(Hardware.repairPlan):Hardware.message||"Checking compatibility…"}
+   ScrollView {Layout.fillWidth:true;implicitHeight:Math.min(350,repairSheet.parent.height/repairSheet.scale-220);clip:true;contentWidth:availableWidth
+    UI.DataView {tokens:hardware.tokens;width:parent.width;value:Hardware.repairPlan.package?Hardware.repairPlan:{status:Hardware.message||"Checking compatibility..."}}
+   }
    S.SettingsAction {tokens:hardware.tokens;Layout.fillWidth:true;text:Hardware.repairPlan.alreadyInstalled?"Already installed":"Install reviewed tool";enabled:!Hardware.busy&&!!Hardware.repairPlan.package&&!Hardware.repairPlan.alreadyInstalled;onClicked:Hardware.installReviewedTool()}
   }
   footer:S.SettingsAction {tokens:hardware.tokens;text:"Close";onClicked:repairSheet.close()}

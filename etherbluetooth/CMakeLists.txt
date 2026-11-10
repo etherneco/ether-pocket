@@ -27,3 +27,5 @@ set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "bluez, python3, qml6-module-qtquick, qml6-module-qtquick-controls, qml6-module-qtquick-layouts, qml6-module-qtquick-window, qml6-module-qtqml-workerscript, qml6-module-qtquick-templates, qt6-svg-plugins, pulseaudio-utils")
 set(CPACK_DEBIAN_PACKAGE_RECOMMENDS "pkexec, pavucontrol")
 include(CPack)
+
+qt_add_resources(etherbluetooth structured-data PREFIX "/" BASE .. FILES ../qml/StructuredData.js)

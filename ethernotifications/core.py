@@ -29,6 +29,46 @@ def plain(value, limit):
                    if c in '\n\t' or (ord(c) >= 32 and c not in '\u202a\u202b\u202c\u202d\u202e\u2066\u2067\u2068\u2069'))[:limit]
 
 
+def readable_data(value, indent='', depth=0):
+    """Present structured notification details as plain text, never markup."""
+    if depth > 12: return indent + 'Further nested details'
+    if isinstance(value, dict):
+        return '\n'.join(indent + re.sub(r'([a-z0-9])([A-Z])', r'\1 \2', str(key)).replace('_', ' ').capitalize() +
+                         (':\n' + readable_data(item, indent + '  ', depth + 1) if isinstance(item, (dict, list)) else ': ' + readable_data(item))
+                         for key, item in value.items()) or 'None'
+    if isinstance(value, list):
+        return '\n'.join(indent + '• ' + readable_data(item, indent + '  ', depth + 1).lstrip() for item in value) or 'None'
+    if value is None: return 'Unavailable'
+    if isinstance(value, bool): return 'Yes' if value else 'No'
+    return str(value)
+
+
+def presentation(row):
+    """Also format persisted legacy notices, without rewriting their history."""
+    body = row['body']
+    kind, separator, document = body.partition(':')
+    try:
+        data = json.loads(document if separator and document.lstrip().startswith(('{', '[')) else body)
+    except (ValueError, TypeError, RecursionError):
+        return row['title'], body
+    if not isinstance(data, (dict, list)): return row['title'], body
+    if row['appId'] == 'etherpower' and row['category'].startswith('system.power.') and isinstance(data, dict):
+        kind = row['category'].removeprefix('system.power.')
+        titles = {'BatteryLow': 'Battery low', 'BatteryCritical': 'Battery critically low',
+                  'BatteryEmergency': 'Charge your phone now', 'BatteryRecovered': 'Battery level recovered',
+                  'ThermalWarning': 'Device temperature warning'}
+        if kind in titles:
+            if kind.startswith('Battery'):
+                capacity = data.get('capacity')
+                remaining = f'{capacity:g}% battery remaining. ' if type(capacity) in (int, float) else ''
+                return titles[kind], remaining + ('Connect a charger to keep your phone running.' if kind != 'BatteryRecovered' else 'Battery is above the warning threshold.')
+            temperatures = []
+            for key, name in [('cpuC', 'CPU'), ('batteryC', 'Battery')]:
+                if type(data.get(key)) in (int, float): temperatures.append(f'{name}: {data[key]:g} °C')
+            return titles[kind], ' · '.join(temperatures + ['Let the phone cool down.'])
+    return row['title'], readable_data(data)
+
+
 def validate_config(config):
     if not isinstance(config, dict) or set(config) - set(DEFAULTS):
         raise Invalid('Unknown notification setting')
@@ -293,6 +333,7 @@ class Engine:
                     card.update(title='Private notification', body='', thread='', group='', groupKey=row['appId'])
                 card['actions'] = []
                 if not row['active']: continue
+            card['title'], card['body'] = presentation(card)
             cards.append(card)
         return dict(ready=True, cards=cards, unread=unread if not self.locked or self.config['lockPrivacy'] != 'hidden' else 0,
                     config=self.config if not self.locked else {}, locked=self.locked, dnd=self.dnd(),

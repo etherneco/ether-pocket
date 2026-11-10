@@ -28,3 +28,5 @@ set(CPACK_DEBIAN_PACKAGE_ARCHITECTURE arm64)
 set(CPACK_DEBIAN_PACKAGE_SHLIBDEPS ON)
 set(CPACK_DEBIAN_PACKAGE_DEPENDS "etherlocation (>= 0.1.1), python3, python3-dbus, python3-gi, libqt6sql6-sqlite, qml6-module-qtquick, qml6-module-qtquick-controls, qml6-module-qtquick-layouts, qml6-module-qtquick-window, qml6-module-qtqml-workerscript, qml6-module-qtquick-templates")
 include(CPack)
+
+qt_add_resources(ethermap structured-data PREFIX "/" BASE .. FILES ../qml/StructuredData.js)

@@ -41,7 +41,7 @@ void BackupClient::request(const QString &method,const QVariantList &args){
    else if(method=="Inspect")m_details=result;
    else if(method=="Preview")m_preview=result;
    else if(method=="Restore"){m_message="Restored and validated in "+result.value("destination").toString();m_preview.clear();m_selected.clear();}
-   else if(method=="RecoveryInfo")m_message="Recovery manifest: "+QString::fromUtf8(QJsonDocument::fromVariant(result).toJson(QJsonDocument::Indented));
+   else if(method=="RecoveryInfo")m_message=text;
    else m_message="Operation completed. Review backup details for the verification result.";
   }
   emit changed();watch->deleteLater();

@@ -5,7 +5,7 @@ import sys
 import tempfile
 import unittest
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
-from core import Engine, Invalid
+from core import Engine, Invalid, presentation
 
 
 class CoreTests(unittest.TestCase):
@@ -24,6 +24,35 @@ class CoreTests(unittest.TestCase):
                       title='Title', body='A private message', actions=['default', 'Open'], hints={}, timeout=0)
         values.update(kwargs)
         return self.engine.notify(**values)
+
+    def test_legacy_power_presentation_and_privacy(self):
+        ident, _ = self.send(app='etherpower', name='EtherPower', title='EtherPower',
+                            body='BatteryEmergency: {"capacity": 2.0, "level": "emergency"}',
+                            hints={'category': 'system.power.BatteryEmergency'})
+        card = self.engine.snapshot()['cards'][0]
+        self.assertEqual(card['title'], 'Charge your phone now')
+        self.assertIn('2% battery remaining', card['body'])
+        self.assertNotIn('{', card['body'])
+        self.assertIn('{', self.engine.rows[ident]['body'])
+        self.engine.locked = True
+        self.assertEqual(self.engine.snapshot()['cards'][0]['body'], '')
+
+    def test_structured_and_plain_notification_bodies(self):
+        row = dict(appId='test', category='', title='Status', body='{"online":true,"nested":{"count":0}}')
+        title, body = presentation(row)
+        self.assertEqual(title, 'Status')
+        self.assertIn('Online: Yes', body)
+        self.assertIn('Count: 0', body)
+        row['body'] = 'Please keep {this text} unchanged.'
+        self.assertEqual(presentation(row)[1], row['body'])
+
+    def test_thermal_presentation_preserves_unknown_measurements(self):
+        row = dict(appId='etherpower', category='system.power.ThermalWarning', title='EtherPower',
+                   body='ThermalWarning: {"cpuC": 85.5, "batteryC": null}')
+        title, body = presentation(row)
+        self.assertEqual(title, 'Device temperature warning')
+        self.assertIn('CPU: 85.5 °C', body)
+        self.assertNotIn('Battery:', body)
 
     def test_ownership_replacement_close_and_actions(self):
         ident, _ = self.send()

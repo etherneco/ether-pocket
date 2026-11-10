@@ -1,3 +1,4 @@
+import "../qml/StructuredData.js" as Data
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
@@ -48,7 +49,7 @@ ColumnLayout {
    Status {text:modelData.status+(modelData.reason?" · "+modelData.reason:"")}
    Row {title:"Release notes";description:modelData.notes||"No release notes"}
    Row {title:"Download and compatibility";description:Math.ceil((modelData.size||0)/1024)+" KiB · "+(modelData.compatible?"Compatible signed manifest":"Compatibility unverified")+(modelData.reboot?" · Reboot required":"")}
-   Row {title:"Dependencies";description:JSON.stringify(modelData.dependencies||{})}
+   Row {title:"Dependencies";description:Data.text(modelData.dependencies||{})}
    S.SettingsSelect {tokens:page.tokens;Layout.fillWidth:true;title:"Channel";model:["Stable","Beta","Nightly","Experimental"];currentIndex:Math.max(0,model.indexOf(modelData.channel));enabled:!page.state.busy;onActivated:index=>{let channel=["Stable","Beta","Nightly","Experimental"][index];if(channel==="Experimental"){experimental.project=modelData.project;experimental.open()}else UpdateControl.channel(modelData.project,channel,false)}}
    Action {text:"Download";visible:page.tx(modelData.transaction).state==="Available";onClicked:UpdateControl.download(modelData.transaction)}
    Action {text:"Review Installation";visible:page.tx(modelData.transaction).state==="Verified";onClicked:UpdateControl.prepare(modelData.transaction)}

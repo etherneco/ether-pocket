@@ -1,3 +1,4 @@
+import "../qml" as UI
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -11,6 +12,9 @@ ColumnLayout {
  property string metric:"capacity"
  property bool technical:false
  property bool draftsSeeded:false
+ property var customPolicies:[]
+ property var customGpu:({})
+ property bool customLoaded:false
  readonly property var snapshot:Power.state.ready?Power.state:({})
  readonly property var config:snapshot.config||({})
  readonly property var profile:snapshot.profileState||({})
@@ -64,11 +68,22 @@ ColumnLayout {
  }
  Card {visible:page.section==="profiles"
   Status {text:"Custom profile · only advertised governors/frequencies are accepted. CPU limits use kHz, GPU limit uses Hz. Unknown keys and policies are rejected."}
-  Action {text:"Load actual current values into editor";onClicked:{let cpu={};for(let p of (page.snapshot.controls||{}).cpu||[])cpu[p.id]={governor:p.governor,maxKHz:p.maxKHz};custom.text=JSON.stringify({cpu:cpu,gpuMaxHz:((page.snapshot.controls||{}).gpu||{}).maxHz},null,2)}}
-  ScrollView {Layout.fillWidth:true;Layout.preferredHeight:170;clip:true;contentWidth:availableWidth
-   TextArea {id:custom;objectName:"powerCustomEditor";width:parent.width;wrapMode:TextEdit.Wrap;selectByMouse:true;placeholderText:"Custom profile JSON";color:page.tokens.ink;placeholderTextColor:page.tokens.muted;font.pixelSize:page.tokens.caption;onActiveFocusChanged:if(activeFocus)page.keyboardRequested();background:Rectangle {color:page.tokens.soft;radius:12;border.color:page.tokens.line}}
+  Action {text:"Load current settings";enabled:!!Power.state.ready;onClicked:{page.customPolicies=((page.snapshot.controls||{}).cpu||[]).map(p=>Object.assign({},p));page.customGpu=Object.assign({},(page.snapshot.controls||{}).gpu||{});page.customLoaded=true}}
+  Repeater {id:customCpu;model:page.customPolicies
+   delegate:ColumnLayout {
+    id:policyEditor;required property var modelData;Layout.fillWidth:true
+    readonly property var profileValues:({governor:governorChoice.currentText,maxKHz:frequencyChoice.model[frequencyChoice.currentIndex]})
+    Row {title:"CPU · "+policyEditor.modelData.id;description:"Cores: "+policyEditor.modelData.cores;arrow:false}
+    Label {text:"Governor";color:page.tokens.ink}
+    ComboBox {id:governorChoice;Layout.fillWidth:true;model:policyEditor.modelData.governors||[];currentIndex:model.indexOf(policyEditor.modelData.governor);Accessible.name:"CPU governor"}
+    Label {text:"Maximum CPU frequency";color:page.tokens.ink}
+    ComboBox {id:frequencyChoice;Layout.fillWidth:true;model:(policyEditor.modelData.frequenciesKHz||[]).filter(f=>f>=policyEditor.modelData.minKHz&&f<=policyEditor.modelData.maxKHz);currentIndex:model.indexOf(policyEditor.modelData.maxKHz);displayText:currentIndex>=0?Number(model[currentIndex]/1000).toLocaleString()+" MHz":"Select a frequency";delegate:ItemDelegate {required property var modelData;width:frequencyChoice.width;text:Number(modelData/1000).toLocaleString()+" MHz"} Accessible.name:"Maximum CPU frequency"}
+   }
   }
-  Action {text:"Apply Custom profile";enabled:!Power.busy&&custom.text.trim().length>0;onClicked:Power.profile("custom",custom.text)}
+  Label {visible:page.customLoaded&&!!page.customGpu.path;text:"Maximum GPU frequency";color:page.tokens.ink}
+  ComboBox {id:gpuFrequency;visible:page.customLoaded&&!!page.customGpu.path;Layout.fillWidth:true;model:(page.customGpu.frequenciesHz||[]).filter(f=>f>=page.customGpu.minHz&&f<=page.customGpu.maxHz);currentIndex:model.indexOf(page.customGpu.maxHz);displayText:currentIndex>=0?Number(model[currentIndex]/1000000).toLocaleString()+" MHz":"Select a frequency";delegate:ItemDelegate {required property var modelData;width:gpuFrequency.width;text:Number(modelData/1000000).toLocaleString()+" MHz"} Accessible.name:"Maximum GPU frequency"}
+  Action {text:"Apply Custom profile";enabled:!Power.busy&&!!Power.state.ready&&page.customLoaded&&page.customPolicies.length>0;onClicked:{let cpu={};for(let i=0;i<customCpu.count;i++){let item=customCpu.itemAt(i);cpu[item.modelData.id]=item.profileValues}let settings={cpu:cpu};if(gpuFrequency.visible&&gpuFrequency.currentIndex>=0)settings.gpuMaxHz=gpuFrequency.model[gpuFrequency.currentIndex];Power.profile("custom",JSON.stringify(settings))}}
+
  }
  Card {visible:page.section==="display"
   S.SettingsSlider {tokens:page.tokens;Layout.fillWidth:true;title:"Panel brightness";value:Number(Core.telemetry.brightness||0);from:1;to:100;suffix:"%";enabled:!!Core.telemetry.brightnessWritable;onMoved:value=>Power.setBrightness(Math.round(value))}
@@ -113,7 +128,7 @@ ColumnLayout {
   Repeater {model:(page.snapshot.controls||{}).cpu||[];delegate:Row {required property var modelData;title:modelData.id+" · CPU "+modelData.cores;description:"Governor: "+modelData.governor+"\nFrequency: "+page.value(modelData.currentKHz/1000," MHz")+"\nLimits: "+page.value(modelData.minKHz/1000," MHz")+" – "+page.value(modelData.maxKHz/1000," MHz")+"\nAvailable governors: "+modelData.governors.join(", ");arrow:false}}
   Row {title:"GPU";description:((page.snapshot.controls||{}).gpu||{}).governor||"Unavailable";arrow:false}
   Action {text:page.technical?"Hide technical evidence":"Show technical evidence";onClicked:page.technical=!page.technical}
-  Status {visible:page.technical;wrapMode:Text.WrapAnywhere;text:JSON.stringify({controls:page.snapshot.controls,thermalZones:page.snapshot.thermalZones,coolingDevices:page.snapshot.coolingDevices,registry:page.snapshot.hardwareRegistry,suspend:page.snapshot.suspend,display:Power.session},null,2)}
+  UI.DataView {tokens:page.tokens;Layout.fillWidth:true;visible:page.technical;value:({controls:page.snapshot.controls,thermalZones:page.snapshot.thermalZones,coolingDevices:page.snapshot.coolingDevices,registry:page.snapshot.hardwareRegistry,suspend:page.snapshot.suspend,display:Power.session})}
   Status {text:"Per-process CPU, RSS and I/O are resource-impact indicators, not validated per-application electrical power. No competing power manager or vendor safety control is installed."}
   Action {text:"Inspect my applications' resource impact";enabled:!Power.busy;onClicked:Power.inspectProcesses()}
   Repeater {model:Power.processes;delegate:Row {required property var modelData;title:modelData.name+" · PID "+modelData.pid;description:"CPU time: "+page.value(modelData.cpuSeconds," s")+" · CPU: "+page.value(modelData.cpuPercentOfOneCore,"%")+"\nMemory: "+page.value(modelData.rssBytes===null?null:modelData.rssBytes/1048576," MiB")+"\nI/O read: "+page.value(modelData.ioReadBytes," B",0)+" · Written: "+page.value(modelData.ioWriteBytes," B",0);arrow:false}}

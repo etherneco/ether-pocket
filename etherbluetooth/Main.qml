@@ -1,3 +1,4 @@
+import "../qml/StructuredData.js" as Data
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
@@ -252,12 +253,12 @@ ApplicationWindow {
                                 id: check
                                 anchors {left: parent.left; right: parent.right; top: parent.top; margins: 14} spacing: 7
                                 Label {text: modelData.stage + "  ·  " + modelData.status; font.bold: true; color: "#142d54"; Layout.fillWidth: true; wrapMode: Text.Wrap}
-                                Muted {text: typeof modelData.evidence === "string" ? modelData.evidence : JSON.stringify(modelData.evidence); Layout.fillWidth: true}
+                                Muted {text: Data.text(modelData.evidence); Layout.fillWidth: true}
                                 Muted {text: modelData.repair; Layout.fillWidth: true; font.pixelSize: 13}
                             }
                         }
                     }
-                    Muted {text: "Device tree: " + JSON.stringify(Bluetooth.diagnosis.device_tree || []); Layout.fillWidth: true}
+                    Muted {text: "Device tree: " + Data.text(Bluetooth.diagnosis.device_tree || []); Layout.fillWidth: true}
                     Muted {text: "Firmware: " + (Bluetooth.diagnosis.firmware_compatibility || "Nie sprawdzono"); Layout.fillWidth: true}
                     Muted {text: "Brak kontrolera oznacza brak testu parowania, audio i urządzeń wejściowych. Poprawny stan BlueZ nie potwierdza działania sprzętu."; Layout.fillWidth: true}
                 }

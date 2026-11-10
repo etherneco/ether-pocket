@@ -116,3 +116,5 @@ include(CPack)
 target_sources(ethershell PRIVATE ../etherlock/lockclient.cpp ../etherlock/lockclient.h)
 target_include_directories(ethershell PRIVATE ../etherlock)
 qt_add_resources(ethershell etherlock PREFIX "/etherlock" BASE ../etherlock FILES ../etherlock/LockPage.qml)
+
+qt_add_resources(ethershell structured-data PREFIX "/" BASE .. FILES ../qml/StructuredData.js ../qml/DataView.qml)
